@@ -1,0 +1,8 @@
+local_docs/
+target/
+.vscode/
+bin/
+*.class
+*.jar
+!lib/*.jar
+
