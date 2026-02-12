@@ -1,0 +1,4 @@
+{
+    "gamesPath": "src/data/Games.json",
+    "usersPath": "src/data/Users.json"
+}
