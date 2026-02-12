@@ -1,0 +1,72 @@
+package server;
+
+import java.nio.ByteBuffer;
+import java.nio.channels.SocketChannel;
+import java.nio.charset.StandardCharsets;
+import com.google.gson.Gson;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+
+import models.Action;
+import models.Response;
+
+public class ServerWorker implements Runnable {
+    private final RequestHandler requestHandler;
+    private final SocketChannel clientSocket;
+
+    public ServerWorker(RequestHandler requestHandler, SocketChannel clientSocket) {
+        this.requestHandler = requestHandler;
+        this.clientSocket = clientSocket;
+    }
+
+    @Override
+    public void run() {
+        String clientIp = null;
+        try {
+            clientIp = clientSocket.getRemoteAddress().toString();
+            ByteBuffer buffer = ByteBuffer.allocate(4096);
+            while (clientSocket.read(buffer) != -1) {
+
+                // flip the buffer to start from the beginning
+                buffer.flip();
+
+                byte[] bytes = new byte[buffer.remaining()];
+                buffer.get(bytes);
+                String requestStr = new String(bytes, StandardCharsets.UTF_8);
+
+                // Clear the buffer for the next read
+                buffer.clear();
+
+                // Parsing JSON
+                JsonObject jsonRequest = new Gson().fromJson(requestStr, JsonObject.class);
+                Action action = Action.valueOf(jsonRequest.get("action").getAsString());
+                JsonElement data = jsonRequest.get("data");
+
+                // Handle the request and get response
+                Response jsonResponse = requestHandler.handleRequest(action, data);
+
+                // Send response back to client
+                String responseStr = new Gson().toJson(jsonResponse);
+                ByteBuffer respBuffer = ByteBuffer.wrap(responseStr.getBytes(StandardCharsets.UTF_8));
+                clientSocket.write(respBuffer);
+            }
+
+        } catch (java.net.SocketException se) {
+            System.out.println("Connessione resettata dal client: " + clientIp);
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (clientSocket != null && clientSocket.isOpen()) {
+                    clientSocket.close();
+                }
+                if (clientIp != null) {
+                    System.out.println("Client disconnected: " + clientIp);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+}

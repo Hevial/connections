@@ -1,7 +1,10 @@
 package server;
 
-import java.net.ServerSocket;
-import java.net.Socket;
+import java.net.InetSocketAddress;
+import java.nio.channels.ServerSocketChannel;
+import java.nio.channels.SocketChannel;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class ServerMain {
 
@@ -16,15 +19,21 @@ public class ServerMain {
     }
 
     private static void startServer(ServerConfig config) {
-        try (ServerSocket serverSocket = new ServerSocket(config.getPort())) {
-            System.out.println("Server started on port " + serverSocket.getLocalPort());
+        try (ServerSocketChannel serverSocket = ServerSocketChannel.open()) {
+            serverSocket.bind(new InetSocketAddress(config.getHost(), config.getPort()));
+            System.out.println("Server started on port " + serverSocket.getLocalAddress());
             System.out.println("Host: " + config.getHost());
             System.out.println("Game Duration: " + config.getGameDuration() + "s");
 
+            ExecutorService executor = Executors.newCachedThreadPool();
+
             while (true) {
                 // Wait for a client to connect
-                Socket clientSocket = serverSocket.accept();
-                System.out.println("Client connected: " + clientSocket.getInetAddress());
+                SocketChannel clientSocket = serverSocket.accept();
+                System.out.println("Client connected: " + clientSocket.getRemoteAddress());
+
+                // Handle the client connection in a separate thread
+                executor.submit(new ServerWorker(new RequestHandler(), clientSocket));
             }
         } catch (Exception e) {
             e.printStackTrace();
