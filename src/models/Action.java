@@ -1,10 +1,9 @@
 package models;
 
 public enum Action {
+    REGISTER,
     LOGIN,
     LOGOUT,
-    START_GAME,
-    END_GAME,
     MAKE_PROPOSAL,
-    GET_GAME_STATE
+    GET_GAME_STATE,
 }

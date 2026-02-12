@@ -2,13 +2,13 @@ package models;
 
 public class Response {
     private Action action;
-    private boolean success;
+    private int statusCode;
     private String message;
     private Object data;
 
-    public Response(Action action, boolean success, String message, Object data) {
+    public Response(Action action, int statusCode, String message, Object data) {
         this.action = action;
-        this.success = success;
+        this.statusCode = statusCode;
         this.message = message;
         this.data = data;
     }
@@ -17,8 +17,8 @@ public class Response {
         return action;
     }
 
-    public boolean isSuccess() {
-        return success;
+    public int getStatusCode() {
+        return statusCode;
     }
 
     public String getMessage() {
