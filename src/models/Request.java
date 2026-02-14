@@ -1,10 +1,12 @@
 package models;
 
+import com.google.gson.JsonElement;
+
 public class Request {
     private Action action;
-    private Object data;
+    private JsonElement data;
 
-    public Request(Action action, Object data) {
+    public Request(Action action, JsonElement data) {
         this.action = action;
         this.data = data;
     }
@@ -13,7 +15,7 @@ public class Request {
         return action;
     }
 
-    public Object getData() {
+    public JsonElement getData() {
         return data;
     }
 }

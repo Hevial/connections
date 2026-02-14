@@ -1,12 +1,14 @@
 package models;
 
+import com.google.gson.JsonElement;
+
 public class Response {
     private Action action;
-    private int statusCode;
+    private StatusCodes statusCode;
     private String message;
-    private Object data;
+    private JsonElement data;
 
-    public Response(Action action, int statusCode, String message, Object data) {
+    public Response(Action action, StatusCodes statusCode, String message, JsonElement data) {
         this.action = action;
         this.statusCode = statusCode;
         this.message = message;
@@ -17,7 +19,7 @@ public class Response {
         return action;
     }
 
-    public int getStatusCode() {
+    public StatusCodes getStatusCode() {
         return statusCode;
     }
 
@@ -25,7 +27,7 @@ public class Response {
         return message;
     }
 
-    public Object getData() {
+    public JsonElement getData() {
         return data;
     }
 }
