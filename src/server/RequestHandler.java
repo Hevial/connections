@@ -6,6 +6,7 @@ import java.util.Map;
 import com.google.gson.JsonElement;
 
 import models.Action;
+import models.Request;
 import models.Response;
 import models.StatusCodes;
 import server.handlers.LoginRequestHandler;
@@ -21,10 +22,14 @@ public class RequestHandler {
         actionHandlers.put(Action.REGISTER, new RegisterRequestHandler());
     }
 
-    public Response handleRequest(Action action, JsonElement data) {
+    public Response handleRequest(Request request) {
+
+        Action action = request.getAction();
+        JsonElement data = request.getData();
+
         RequestActionHandler handler = actionHandlers.get(action);
         if (handler == null) {
-            return new Response(action, StatusCodes.NOT_FOUND.getCode(), "Unknown action: " + action, null);
+            return new Response(action, StatusCodes.NOT_FOUND, "Unknown action: " + action, null);
         }
         return handler.handle(data);
     }
