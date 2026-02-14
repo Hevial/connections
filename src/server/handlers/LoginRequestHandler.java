@@ -37,14 +37,14 @@ public class LoginRequestHandler implements RequestActionHandler {
 
         // Validate request body
         if (data == null || !data.isJsonObject()) {
-            return new Response(Action.LOGIN, StatusCodes.BAD_REQUEST.getCode(), "Login failed: Invalid request body",
+            return new Response(Action.LOGIN, StatusCodes.BAD_REQUEST, "Login failed: Invalid request body",
                     null);
         }
 
         // Validate required fields
         JsonObject body = data.getAsJsonObject();
         if (!body.has("username") || !body.has("password")) {
-            return new Response(Action.LOGIN, StatusCodes.BAD_REQUEST.getCode(),
+            return new Response(Action.LOGIN, StatusCodes.BAD_REQUEST,
                     "Login failed: Missing username or password", null);
         }
 
@@ -55,7 +55,7 @@ public class LoginRequestHandler implements RequestActionHandler {
         String password = user.getPassword();
 
         if (username.isEmpty() || password.trim().isEmpty()) {
-            return new Response(Action.LOGIN, StatusCodes.BAD_REQUEST.getCode(),
+            return new Response(Action.LOGIN, StatusCodes.BAD_REQUEST,
                     "Login failed: Invalid username or password", null);
         }
 
@@ -63,18 +63,18 @@ public class LoginRequestHandler implements RequestActionHandler {
         DBManager dbManager = DBManager.getInstance();
         try {
             if (!dbManager.loginUser(username, password)) {
-                return new Response(Action.LOGIN, StatusCodes.UNAUTHORIZED.getCode(),
+                return new Response(Action.LOGIN, StatusCodes.UNAUTHORIZED,
                         "Login failed: Invalid username or password", null);
             }
 
             // TODO: get actual game data for the user
             JsonObject gameData = new JsonObject();
             gameData.addProperty("message", "Welcome back, " + username + "!");
-            return new Response(Action.LOGIN, StatusCodes.SUCCESS.getCode(), "Login successful", gameData);
+            return new Response(Action.LOGIN, StatusCodes.SUCCESS, "Login successful", gameData);
             // TODO: END
 
         } catch (Exception e) {
-            return new Response(Action.LOGIN, StatusCodes.INTERNAL_SERVER_ERROR.getCode(),
+            return new Response(Action.LOGIN, StatusCodes.INTERNAL_SERVER_ERROR,
                     "Login failed: Server error", null);
         }
 

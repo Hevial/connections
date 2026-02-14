@@ -45,14 +45,14 @@ public class RegisterRequestHandler implements RequestActionHandler {
     public Response handle(JsonElement data) {
         // Validate request body
         if (data == null || !data.isJsonObject()) {
-            return new Response(Action.REGISTER, StatusCodes.BAD_REQUEST.getCode(),
+            return new Response(Action.REGISTER, StatusCodes.BAD_REQUEST,
                     "Registration failed: Invalid request body", null);
         }
 
         // Validate required fields
         JsonObject body = data.getAsJsonObject();
         if (!body.has("username") || !body.has("password")) {
-            return new Response(Action.REGISTER, StatusCodes.BAD_REQUEST.getCode(),
+            return new Response(Action.REGISTER, StatusCodes.BAD_REQUEST,
                     "Registration failed: Missing username or password", null);
         }
 
@@ -64,7 +64,7 @@ public class RegisterRequestHandler implements RequestActionHandler {
 
         // Validate username and password
         if (username.isEmpty() || password.trim().isEmpty()) {
-            return new Response(Action.REGISTER, StatusCodes.BAD_REQUEST.getCode(),
+            return new Response(Action.REGISTER, StatusCodes.BAD_REQUEST,
                     "Registration failed: Username or password is empty", null);
         }
 
@@ -73,12 +73,12 @@ public class RegisterRequestHandler implements RequestActionHandler {
         try {
             User newUser = new User(username, password);
             if (dbManager.addNewUser(newUser)) {
-                return new Response(Action.REGISTER, StatusCodes.SUCCESS.getCode(), "Registration successful", null);
+                return new Response(Action.REGISTER, StatusCodes.SUCCESS, "Registration successful", null);
             }
-            return new Response(Action.REGISTER, StatusCodes.CONFLICT.getCode(),
+            return new Response(Action.REGISTER, StatusCodes.CONFLICT,
                     "Registration failed: User already exists", null);
         } catch (RuntimeException e) {
-            return new Response(Action.REGISTER, StatusCodes.INTERNAL_SERVER_ERROR.getCode(),
+            return new Response(Action.REGISTER, StatusCodes.INTERNAL_SERVER_ERROR,
                     "Registration failed: Server error", null);
         }
     }
