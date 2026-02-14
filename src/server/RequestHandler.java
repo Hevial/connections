@@ -1,5 +1,6 @@
 package server;
 
+import java.util.EnumMap;
 import java.util.Map;
 
 import com.google.gson.JsonElement;
@@ -12,9 +13,13 @@ import server.handlers.RegisterRequestHandler;
 import server.handlers.RequestActionHandler;
 
 public class RequestHandler {
-    private final Map<Action, RequestActionHandler> actionHandlers = Map.of(
-            Action.LOGIN, new LoginRequestHandler(),
-            Action.REGISTER, new RegisterRequestHandler());
+    private final Map<Action, RequestActionHandler> actionHandlers;
+
+    public RequestHandler() {
+        actionHandlers = new EnumMap<>(Action.class);
+        actionHandlers.put(Action.LOGIN, new LoginRequestHandler());
+        actionHandlers.put(Action.REGISTER, new RegisterRequestHandler());
+    }
 
     public Response handleRequest(Action action, JsonElement data) {
         RequestActionHandler handler = actionHandlers.get(action);
