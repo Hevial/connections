@@ -1,6 +1,6 @@
 package models;
 
-public enum statusCodes {
+public enum StatusCodes {
     SUCCESS(200),
     BAD_REQUEST(400),
     UNAUTHORIZED(401),
@@ -11,7 +11,7 @@ public enum statusCodes {
 
     private final int code;
 
-    statusCodes(int code) {
+    StatusCodes(int code) {
         this.code = code;
     }
 
