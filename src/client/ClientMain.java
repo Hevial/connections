@@ -1,6 +1,8 @@
 package client;
 
-import java.net.Socket;
+import java.net.InetSocketAddress;
+import java.net.SocketAddress;
+import java.nio.channels.SocketChannel;
 import java.util.Scanner;
 
 public class ClientMain {
@@ -18,8 +20,9 @@ public class ClientMain {
     private static void startClient(ClientConfig config) {
         System.out.println("Client will connect to " + config.getServerHostname() + ":" + config.getServerPort());
 
-        try (Socket socket = new Socket(config.getServerHostname(), config.getServerPort())) {
-            System.out.println("Connected to server: " + socket.getInetAddress());
+        SocketAddress serverAddress = new InetSocketAddress(config.getServerHostname(), config.getServerPort());
+        try (SocketChannel socket = SocketChannel.open(serverAddress)) {
+            System.out.println("Connected to server: " + socket.getRemoteAddress());
 
             Scanner scanner = new Scanner(System.in);
             System.out.print("Benvenuto!");
