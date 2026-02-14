@@ -33,7 +33,7 @@ public class ServerMain {
                 System.out.println("Client connected: " + clientSocket.getRemoteAddress());
 
                 // Handle the client connection in a separate thread
-                executor.submit(new ServerWorker(new RequestHandler(), clientSocket));
+                executor.execute(new ServerWorker(new RequestHandler(), clientSocket));
             }
         } catch (Exception e) {
             e.printStackTrace();
