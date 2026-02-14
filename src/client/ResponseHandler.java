@@ -6,6 +6,7 @@ import com.google.gson.JsonElement;
 
 import client.handlers.ResponseActionHandler;
 import models.Action;
+import models.StatusCodes;
 
 public class ResponseHandler {
 
@@ -16,12 +17,12 @@ public class ResponseHandler {
     // ...
     );
 
-    public void handleResponse(Action action, boolean success, String message, JsonElement data) {
+    public void handleResponse(Action action, StatusCodes statusCode, String message, JsonElement data) {
         ResponseActionHandler handler = actionHandlers.get(action);
         if (handler == null) {
             System.err.println("Unknown action in response: " + action);
             return;
         }
-        handler.handle(success, message, data);
+        handler.handle(statusCode, message, data);
     }
 }
