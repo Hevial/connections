@@ -18,4 +18,13 @@ public enum StatusCodes {
     public int getCode() {
         return code;
     }
+
+    public static StatusCodes fromCode(int code) {
+        for (StatusCodes status : values()) {
+            if (status.code == code) {
+                return status;
+            }
+        }
+        throw new IllegalArgumentException("Unknown status code: " + code);
+    }
 }
