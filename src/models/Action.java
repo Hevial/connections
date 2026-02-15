@@ -4,6 +4,7 @@ public enum Action {
     REGISTER,
     LOGIN,
     LOGOUT,
+    UPDATE_CREDENTIALS,
     MAKE_PROPOSAL,
     REQUEST_GAME_STATUS,
     REQUEST_GAME_STATS,
