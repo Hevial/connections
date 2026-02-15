@@ -4,10 +4,8 @@ import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
 import java.nio.charset.StandardCharsets;
 import com.google.gson.Gson;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
 
-import models.Action;
+import models.Request;
 import models.Response;
 
 public class ServerWorker implements Runnable {
@@ -34,21 +32,27 @@ public class ServerWorker implements Runnable {
                 buffer.get(bytes);
                 String requestStr = new String(bytes, StandardCharsets.UTF_8);
 
+                // DEBUG: print the raw request string
+                System.out.println("Recived req: " + requestStr + " from " + clientIp);
+
                 // Clear the buffer for the next read
                 buffer.clear();
 
                 // Parsing JSON
-                JsonObject jsonRequest = new Gson().fromJson(requestStr, JsonObject.class);
-                Action action = Action.valueOf(jsonRequest.get("action").getAsString());
-                JsonElement data = jsonRequest.get("data");
+                Request req = new Gson().fromJson(requestStr, Request.class);
+                if (req == null) {
+                    System.err.println("Error: Received null request from client: " + clientIp);
+                    continue;
+                }
 
                 // Handle the request and get response
-                Response jsonResponse = requestHandler.handleRequest(action, data);
+                Response jsonResponse = requestHandler.handleRequest(req);
 
                 // Send response back to client
                 String responseStr = new Gson().toJson(jsonResponse);
                 ByteBuffer respBuffer = ByteBuffer.wrap(responseStr.getBytes(StandardCharsets.UTF_8));
                 clientSocket.write(respBuffer);
+
             }
 
         } catch (java.net.SocketException se) {

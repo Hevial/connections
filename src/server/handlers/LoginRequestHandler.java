@@ -70,6 +70,7 @@ public class LoginRequestHandler implements RequestActionHandler {
             // TODO: get actual game data for the user
             JsonObject gameData = new JsonObject();
             gameData.addProperty("message", "Welcome back, " + username + "!");
+            gameData.addProperty("username", username);
             return new Response(Action.LOGIN, StatusCodes.SUCCESS, "Login successful", gameData);
             // TODO: END
 
