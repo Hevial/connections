@@ -1,0 +1,13 @@
+package models;
+
+public enum DBStatus {
+
+    SUCCESS,
+
+    USER_NOT_FOUND,
+    WRONG_PASSWORD,
+    USERNAME_ALREADY_EXISTS,
+    USER_ALREADY_LOGGED_IN,
+
+    DATABASE_ERROR
+}

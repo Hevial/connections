@@ -4,6 +4,10 @@ import java.util.Map;
 import java.util.Scanner;
 import java.util.function.Supplier;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonElement;
+
+import models.Action;
 import models.Request;
 import models.User;
 
@@ -40,6 +44,8 @@ public abstract class BaseMenu {
     protected String currAction;
     protected String data;
 
+    protected Gson gson = new Gson();
+
     protected BaseMenu(Scanner scanner) {
         this.scanner = scanner;
     }
@@ -52,6 +58,10 @@ public abstract class BaseMenu {
 
     public void setUsername(String username) {
         this.username = username;
+    }
+
+    public String getUsername() {
+        return username;
     }
 
     public void setCurrAction(String action) {
@@ -110,6 +120,14 @@ public abstract class BaseMenu {
         }
     }
 
+    public Request buildUpdateCredentialsRequest() {
+        setCurrAction("AGGIORNA CREDENZIALI");
+        User oldUser = requestCredentials("Vecchio Username: ", "Vecchia Password: ");
+        User newUser = requestCredentials("Nuovo Username: ", "Nuova Password: ");
+        JsonElement data = gson.toJsonTree(Map.of("oldUser", oldUser, "newUser", newUser));
+        return new Request(Action.UPDATE_CREDENTIALS, data);
+    }
+
     /* Template Methods for Menu Display */
 
     protected void printHeader() {
@@ -139,10 +157,10 @@ public abstract class BaseMenu {
 
     protected void printDynamicInfo() {
         if (lastMessage != null && !lastMessage.isBlank())
-            System.out.println("╠ Messaggio: %-21s " + lastMessage);
+            System.out.println("╠ Messaggio: " + lastMessage);
 
         if (currAction != null)
-            System.out.println("╠ Azione: %-24s" + currAction);
+            System.out.println("╠ Azione: " + currAction);
 
         if (username != null)
             System.out.println("╠ Utente: " + username);

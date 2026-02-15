@@ -6,7 +6,6 @@ import java.util.Map;
 import java.util.Scanner;
 import java.util.function.Supplier;
 
-import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 
 import models.Action;
@@ -16,13 +15,13 @@ import models.User;
 public class MainMenu extends BaseMenu {
 
     private final Map<Integer, Supplier<Request>> requestBuilders;
-    private static final Gson gson = new Gson();
 
     public MainMenu(Scanner scanner) {
         super(scanner);
         this.requestBuilders = new HashMap<>();
         this.requestBuilders.put(1, this::buildLoginRequest);
         this.requestBuilders.put(2, this::buildRegisterRequest);
+        this.requestBuilders.put(3, this::buildUpdateCredentialsRequest);
         this.requestBuilders.put(0, () -> {
             clearScreen();
             System.exit(0);

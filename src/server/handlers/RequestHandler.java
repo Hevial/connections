@@ -17,6 +17,7 @@ public class RequestHandler {
         actionHandlers = new EnumMap<>(Action.class);
         actionHandlers.put(Action.LOGIN, new LoginRequestHandler());
         actionHandlers.put(Action.REGISTER, new RegisterRequestHandler());
+        actionHandlers.put(Action.UPDATE_CREDENTIALS, new UpdateCredentialsRequestHandler());
     }
 
     public Response handleRequest(Request request) {

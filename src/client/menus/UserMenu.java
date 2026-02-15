@@ -15,6 +15,7 @@ public class UserMenu extends BaseMenu {
     public UserMenu(Scanner scanner) {
         super(scanner);
         this.requestBuilders = new HashMap<>();
+        this.requestBuilders.put(5, this::buildUpdateCredentialsRequest);
         this.requestBuilders.put(0, () -> {
             clearScreen();
             System.exit(0);

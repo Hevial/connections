@@ -8,6 +8,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
+import models.DBStatus;
 import models.User;
 
 public class DBManager {
@@ -65,7 +66,7 @@ public class DBManager {
      * @return {@code true} if the user was successfully added, {@code false} if a
      *         user with the same username already exists
      */
-    public boolean addNewUser(User user) {
+    public synchronized boolean addNewUser(User user) {
         if (usersCache.putIfAbsent(user.getUsername(), user) != null) {
             return false; // User already exists
         }
@@ -79,14 +80,13 @@ public class DBManager {
      *
      * @param username the username of the user attempting to log in
      * @param password the password of the user attempting to log in
-     * @return true if the user exists in the cache and the password matches; false
-     *         otherwise
+     * @return true if the user exists in the cache, the password matches and is not
+     *         logged in; false otherwise
      */
     public boolean loginUser(String username, String password) {
         User user = usersCache.get(username);
-        if (user != null && user.getPassword().equals(password)) { // User exists and password matches, log them in
-            loggedInUsers.add(username);
-            return true;
+        if (user != null && user.getPassword().equals(password)) {
+            return loggedInUsers.add(username);
         }
         return false;
     }
@@ -100,6 +100,26 @@ public class DBManager {
      */
     public boolean logoutUser(String username) {
         return loggedInUsers.remove(username);
+    }
+
+    public synchronized DBStatus updateCredentials(String oldUsername, String oldPassword, String newUsername,
+            String newPassword) {
+        User oldUser = usersCache.get(oldUsername);
+
+        if (oldUser == null)
+            return DBStatus.USER_NOT_FOUND;
+
+        if (!oldUser.getPassword().equals(oldPassword))
+            return DBStatus.WRONG_PASSWORD;
+
+        if (!oldUsername.equals(newUsername) && usersCache.containsKey(newUsername))
+            return DBStatus.USERNAME_ALREADY_EXISTS;
+
+        usersCache.remove(oldUsername);
+        usersCache.put(newUsername, new User(newUsername, newPassword));
+        saveUsers();
+
+        return DBStatus.SUCCESS;
     }
 
     /**
@@ -117,7 +137,7 @@ public class DBManager {
      * @throws RuntimeException if the users file cannot be read or the JSON cannot
      *                          be parsed
      */
-    private void loadUsers() {
+    synchronized private void loadUsers() {
         try (FileReader reader = new FileReader(config.getUsersPath())) {
             Gson gson = new Gson();
             User[] usersArray = gson.fromJson(reader, User[].class);
@@ -140,7 +160,7 @@ public class DBManager {
      * @throws RuntimeException if an I/O error occurs while writing to the file
      * 
      */
-    private void saveUsers() {
+    synchronized private void saveUsers() {
         try (FileWriter writer = new FileWriter(config.getUsersPath())) {
             Gson gson = new GsonBuilder().setPrettyPrinting().create();
             gson.toJson(usersCache.values(), writer);

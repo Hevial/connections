@@ -62,6 +62,7 @@ public class LoginRequestHandler implements RequestActionHandler {
         // Authenticate user
         DBManager dbManager = DBManager.getInstance();
         try {
+            // TODO FIX USING DBStatus INSTEAD OF BOOLEAN
             if (!dbManager.loginUser(username, password)) {
                 return new Response(Action.LOGIN, StatusCodes.UNAUTHORIZED,
                         "Login failed: Invalid username or password", null);

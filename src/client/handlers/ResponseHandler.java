@@ -19,6 +19,7 @@ public class ResponseHandler {
         this.actionHandlers = new EnumMap<>(Action.class);
         this.actionHandlers.put(Action.REGISTER, new RegisterResponseHandler());
         this.actionHandlers.put(Action.LOGIN, new LoginResponseHandler(scanner));
+        this.actionHandlers.put(Action.UPDATE_CREDENTIALS, new UpdateCredentialsResponseHandler());
     }
 
     public BaseMenu handleResponse(Response response, BaseMenu currentMenu) {
@@ -36,7 +37,7 @@ public class ResponseHandler {
         ResponseActionHandler handler = actionHandlers.get(action);
         if (handler == null) {
             System.err.println("Unknown action in response: " + action);
-            currentMenu.setLastMessage("Azione sconosciuta ricevuta dal server.");
+            currentMenu.setLastMessage("Handler non trovato per l'azione: " + action);
             return currentMenu;
         }
 
