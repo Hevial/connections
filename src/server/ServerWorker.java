@@ -7,6 +7,7 @@ import com.google.gson.Gson;
 
 import models.Request;
 import models.Response;
+import server.handlers.RequestHandler;
 
 public class ServerWorker implements Runnable {
     private final RequestHandler requestHandler;

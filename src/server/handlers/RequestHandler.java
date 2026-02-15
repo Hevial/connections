@@ -1,4 +1,4 @@
-package server;
+package server.handlers;
 
 import java.util.EnumMap;
 import java.util.Map;
@@ -9,9 +9,6 @@ import models.Action;
 import models.Request;
 import models.Response;
 import models.StatusCodes;
-import server.handlers.LoginRequestHandler;
-import server.handlers.RegisterRequestHandler;
-import server.handlers.RequestActionHandler;
 
 public class RequestHandler {
     private final Map<Action, RequestActionHandler> actionHandlers;

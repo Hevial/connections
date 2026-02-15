@@ -1,12 +1,12 @@
-package client;
+package client.handlers;
 
 import java.util.EnumMap;
 import java.util.Map;
+import java.util.Scanner;
 
 import com.google.gson.JsonElement;
 
-import client.handlers.RegisterResponseHandler;
-import client.handlers.ResponseActionHandler;
+import client.menus.BaseMenu;
 import models.Action;
 import models.Response;
 import models.StatusCodes;
@@ -15,15 +15,17 @@ public class ResponseHandler {
 
     private final Map<Action, ResponseActionHandler> actionHandlers;
 
-    public ResponseHandler() {
+    public ResponseHandler(Scanner scanner) {
         this.actionHandlers = new EnumMap<>(Action.class);
         this.actionHandlers.put(Action.REGISTER, new RegisterResponseHandler());
+        this.actionHandlers.put(Action.LOGIN, new LoginResponseHandler(scanner));
     }
 
-    public void handleResponse(Response response) {
+    public BaseMenu handleResponse(Response response, BaseMenu currentMenu) {
         if (response == null) {
             System.err.println("Received null response");
-            return;
+            currentMenu.setLastMessage("Errore di comunicazione con il server. Riprova.");
+            return currentMenu;
         }
 
         Action action = response.getAction();
@@ -34,8 +36,10 @@ public class ResponseHandler {
         ResponseActionHandler handler = actionHandlers.get(action);
         if (handler == null) {
             System.err.println("Unknown action in response: " + action);
-            return;
+            currentMenu.setLastMessage("Azione sconosciuta ricevuta dal server.");
+            return currentMenu;
         }
-        handler.handle(statusCode, message, data);
+
+        return handler.handle(statusCode, message, data, currentMenu);
     }
 }
