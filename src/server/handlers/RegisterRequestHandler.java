@@ -4,10 +4,10 @@ import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
-import models.Action;
 import models.Response;
 import models.User;
-import models.StatusCodes;
+import models.enums.Action;
+import models.enums.StatusCodes;
 import server.db.DBManager;
 
 /**

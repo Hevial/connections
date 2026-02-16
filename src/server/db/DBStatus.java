@@ -1,4 +1,4 @@
-package models;
+package server.db;
 
 public enum DBStatus {
 

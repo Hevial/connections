@@ -8,9 +8,9 @@ import java.util.function.Supplier;
 
 import com.google.gson.JsonElement;
 
-import models.Action;
 import models.Request;
 import models.User;
+import models.enums.Action;
 
 public class MainMenu extends BaseMenu {
 

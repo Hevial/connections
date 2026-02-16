@@ -8,7 +8,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
-import models.DBStatus;
 import models.User;
 
 public class DBManager {

@@ -3,7 +3,7 @@ package client.handlers;
 import com.google.gson.JsonElement;
 
 import client.menus.BaseMenu;
-import models.StatusCodes;
+import models.enums.StatusCodes;
 
 /**
  * Defines a handler for processing server responses based on action type.
