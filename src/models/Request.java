@@ -2,6 +2,8 @@ package models;
 
 import com.google.gson.JsonElement;
 
+import models.enums.Action;
+
 public class Request {
     private Action action;
     private JsonElement data;

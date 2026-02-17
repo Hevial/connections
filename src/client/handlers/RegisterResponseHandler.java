@@ -3,7 +3,7 @@ package client.handlers;
 import com.google.gson.JsonElement;
 
 import client.menus.BaseMenu;
-import models.StatusCodes;
+import models.enums.StatusCodes;
 
 public class RegisterResponseHandler implements ResponseActionHandler {
 

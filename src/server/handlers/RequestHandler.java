@@ -5,10 +5,10 @@ import java.util.Map;
 
 import com.google.gson.JsonElement;
 
-import models.Action;
 import models.Request;
 import models.Response;
-import models.StatusCodes;
+import models.enums.Action;
+import models.enums.StatusCodes;
 
 public class RequestHandler {
     private final Map<Action, RequestActionHandler> actionHandlers;

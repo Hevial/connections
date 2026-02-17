@@ -7,9 +7,9 @@ import java.util.Scanner;
 import com.google.gson.JsonElement;
 
 import client.menus.BaseMenu;
-import models.Action;
 import models.Response;
-import models.StatusCodes;
+import models.enums.Action;
+import models.enums.StatusCodes;
 
 public class ResponseHandler {
 

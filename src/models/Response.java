@@ -2,6 +2,9 @@ package models;
 
 import com.google.gson.JsonElement;
 
+import models.enums.Action;
+import models.enums.StatusCodes;
+
 public class Response {
     private Action action;
     private StatusCodes statusCode;

@@ -6,7 +6,7 @@ import com.google.gson.JsonElement;
 
 import client.menus.BaseMenu;
 import client.menus.UserMenu;
-import models.StatusCodes;
+import models.enums.StatusCodes;
 
 public class LoginResponseHandler implements ResponseActionHandler {
 

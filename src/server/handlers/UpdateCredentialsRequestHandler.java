@@ -3,11 +3,11 @@ package server.handlers;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
-import models.Action;
-import models.DBStatus;
 import models.Response;
-import models.StatusCodes;
+import models.enums.Action;
+import models.enums.StatusCodes;
 import server.db.DBManager;
+import server.db.DBStatus;
 
 public class UpdateCredentialsRequestHandler implements RequestActionHandler {
 
