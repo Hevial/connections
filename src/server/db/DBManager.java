@@ -1,5 +1,6 @@
 package server.db;
 
+import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.util.Set;
@@ -137,6 +138,11 @@ public class DBManager {
      *                          be parsed
      */
     synchronized private void loadUsers() {
+        File file = new File(config.getUsersPath());
+        if (!file.exists()) {
+            return; // No users to load, start with an empty cache
+        }
+
         try (FileReader reader = new FileReader(config.getUsersPath())) {
             Gson gson = new Gson();
             User[] usersArray = gson.fromJson(reader, User[].class);
@@ -164,7 +170,7 @@ public class DBManager {
             Gson gson = new GsonBuilder().setPrettyPrinting().create();
             gson.toJson(usersCache.values(), writer);
         } catch (Exception e) {
-            throw new RuntimeException("Failed to load users from database", e);
+            throw new RuntimeException("Failed to save users from database", e);
         }
     }
 

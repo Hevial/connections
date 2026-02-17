@@ -4,5 +4,5 @@ target/
 bin/
 *.class
 *.jar
-!lib/*.jar
-
+lib/
+src/data/Users.json
