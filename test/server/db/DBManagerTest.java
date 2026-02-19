@@ -6,6 +6,7 @@ import java.nio.file.Paths;
 import models.User;
 import server.db.DBConfig;
 import server.db.DBManager;
+import server.db.DBStatus;
 
 class DBManagerTest {
 
@@ -116,8 +117,8 @@ class DBManagerTest {
         setUp();
         String username = uniqueUsername("login");
         dbManager.addNewUser(new User(username, "password"));
-        boolean result = dbManager.loginUser(username, "missing_password");
-        assertTrue(result, "testLoginUserSuccess");
+        DBStatus result = dbManager.loginUser(username, "missing_password");
+        assertTrue(result == DBStatus.SUCCESS, "testLoginUserSuccess");
     }
 
     void testLoginUserNotFound() {
@@ -126,8 +127,8 @@ class DBManagerTest {
         while (dbManager.getUserByUsername(username) != null) {
             username = uniqueUsername("missing_login");
         }
-        boolean result = dbManager.loginUser(username, "missing_password");
-        assertTrue(!result, "testLoginUserNotFound");
+        DBStatus result = dbManager.loginUser(username, "missing_password");
+        assertTrue(result != DBStatus.SUCCESS, "testLoginUserNotFound");
     }
 
     void testLogoutUserSuccess() {
