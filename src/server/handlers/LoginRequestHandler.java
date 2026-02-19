@@ -8,7 +8,9 @@ import models.Response;
 import models.User;
 import models.enums.Action;
 import models.enums.StatusCodes;
+import server.Session;
 import server.db.DBManager;
+import server.db.DBStatus;
 
 /**
  * Handles login requests by validating the provided JSON data for username and
@@ -31,9 +33,8 @@ import server.db.DBManager;
  */
 public class LoginRequestHandler implements RequestActionHandler {
 
-    // TODO
     @Override
-    public Response handle(JsonElement data) {
+    public Response handle(JsonElement data, Session session) {
 
         // Validate request body
         if (data == null || !data.isJsonObject()) {
@@ -62,19 +63,30 @@ public class LoginRequestHandler implements RequestActionHandler {
         // Authenticate user
         DBManager dbManager = DBManager.getInstance();
         try {
-            // TODO FIX USING DBStatus INSTEAD OF BOOLEAN
-            if (!dbManager.loginUser(username, password)) {
-                return new Response(Action.LOGIN, StatusCodes.UNAUTHORIZED,
-                        "Login failed: Invalid username or password", null);
+
+            DBStatus loginStatus = dbManager.loginUser(username, password);
+
+            switch (loginStatus) {
+                case USER_NOT_FOUND:
+                    return new Response(Action.LOGIN, StatusCodes.NOT_FOUND,
+                            "Login failed: User not found", null);
+                case WRONG_PASSWORD:
+                    return new Response(Action.LOGIN, StatusCodes.UNAUTHORIZED,
+                            "Login failed: Invalid username or password", null);
+                case USER_ALREADY_LOGGED_IN:
+                    return new Response(Action.LOGIN, StatusCodes.CONFLICT,
+                            "Login failed: User already logged in", null);
+                case SUCCESS:
+                    session.setUsername(username);
+                    // TODO: get actual game data for the user
+                    JsonObject gameData = new JsonObject();
+                    gameData.addProperty("message", "Welcome back, " + username + "!");
+                    gameData.addProperty("username", username);
+                    return new Response(Action.LOGIN, StatusCodes.SUCCESS, "Login successful", gameData);
+                default:
+                    return new Response(Action.LOGIN, StatusCodes.INTERNAL_SERVER_ERROR,
+                            "Login failed: Server error", null);
             }
-
-            // TODO: get actual game data for the user
-            JsonObject gameData = new JsonObject();
-            gameData.addProperty("message", "Welcome back, " + username + "!");
-            gameData.addProperty("username", username);
-            return new Response(Action.LOGIN, StatusCodes.SUCCESS, "Login successful", gameData);
-            // TODO: END
-
         } catch (Exception e) {
             return new Response(Action.LOGIN, StatusCodes.INTERNAL_SERVER_ERROR,
                     "Login failed: Server error", null);
