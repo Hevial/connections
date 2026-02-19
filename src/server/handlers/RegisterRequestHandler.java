@@ -8,6 +8,7 @@ import models.Response;
 import models.User;
 import models.enums.Action;
 import models.enums.StatusCodes;
+import server.Session;
 import server.db.DBManager;
 
 /**
@@ -42,18 +43,18 @@ import server.db.DBManager;
 public class RegisterRequestHandler implements RequestActionHandler {
 
     @Override
-    public Response handle(JsonElement data) {
+    public Response handle(JsonElement data, Session session) {
         // Validate request body
         if (data == null || !data.isJsonObject()) {
             return new Response(Action.REGISTER, StatusCodes.BAD_REQUEST,
-                    "Registration failed: Invalid request body", null);
+                    "Registrazione fallita: corpo della richiesta non valido", null);
         }
 
         // Validate required fields
         JsonObject body = data.getAsJsonObject();
         if (!body.has("username") || !body.has("password")) {
             return new Response(Action.REGISTER, StatusCodes.BAD_REQUEST,
-                    "Registration failed: Missing username or password", null);
+                    "Registrazione fallita: username o password mancanti", null);
         }
 
         // create User object from JSON
@@ -65,7 +66,7 @@ public class RegisterRequestHandler implements RequestActionHandler {
         // Validate username and password
         if (username.isEmpty() || password.trim().isEmpty()) {
             return new Response(Action.REGISTER, StatusCodes.BAD_REQUEST,
-                    "Registration failed: Username or password is empty", null);
+                    "Registrazione fallita: username o password vuoti", null);
         }
 
         // Attempt to register the user in the database
@@ -73,13 +74,13 @@ public class RegisterRequestHandler implements RequestActionHandler {
         try {
             User newUser = new User(username, password);
             if (dbManager.addNewUser(newUser)) {
-                return new Response(Action.REGISTER, StatusCodes.SUCCESS, "Registration successful", null);
+                return new Response(Action.REGISTER, StatusCodes.SUCCESS, "Registrazione avvenuta con successo", null);
             }
             return new Response(Action.REGISTER, StatusCodes.CONFLICT,
-                    "Registration failed: User already exists", null);
+                    "Registrazione fallita: l'utente esiste già", null);
         } catch (RuntimeException e) {
             return new Response(Action.REGISTER, StatusCodes.INTERNAL_SERVER_ERROR,
-                    "Registration failed: Server error", null);
+                    "Registrazione fallita: errore del server", null);
         }
     }
 
