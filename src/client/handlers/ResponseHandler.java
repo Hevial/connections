@@ -20,6 +20,7 @@ public class ResponseHandler {
         this.actionHandlers.put(Action.REGISTER, new RegisterResponseHandler());
         this.actionHandlers.put(Action.LOGIN, new LoginResponseHandler(scanner));
         this.actionHandlers.put(Action.UPDATE_CREDENTIALS, new UpdateCredentialsResponseHandler());
+        this.actionHandlers.put(Action.LOGOUT, new LogoutResponseHandler(scanner));
     }
 
     public BaseMenu handleResponse(Response response, BaseMenu currentMenu) {

@@ -16,6 +16,7 @@ public class UserMenu extends BaseMenu {
         super(scanner);
         this.requestBuilders = new HashMap<>();
         this.requestBuilders.put(5, this::buildUpdateCredentialsRequest);
+        this.requestBuilders.put(6, this::buildLogoutRequest);
         this.requestBuilders.put(0, () -> {
             clearScreen();
             System.exit(0);
@@ -44,5 +45,9 @@ public class UserMenu extends BaseMenu {
         options.put(6, "Logout");
         options.put(0, "Esci");
         return options;
+    }
+
+    private Request buildLogoutRequest() {
+        return new Request(models.enums.Action.LOGOUT, null);
     }
 }
