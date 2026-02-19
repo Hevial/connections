@@ -7,15 +7,18 @@ import com.google.gson.Gson;
 
 import models.Request;
 import models.Response;
+import server.db.DBManager;
 import server.handlers.RequestHandler;
 
 public class ServerWorker implements Runnable {
     private final RequestHandler requestHandler;
     private final SocketChannel clientSocket;
+    private Session session;
 
     public ServerWorker(RequestHandler requestHandler, SocketChannel clientSocket) {
         this.requestHandler = requestHandler;
         this.clientSocket = clientSocket;
+        this.session = new Session(null); // Initialize session with no user
     }
 
     @Override
@@ -47,7 +50,7 @@ public class ServerWorker implements Runnable {
                 }
 
                 // Handle the request and get response
-                Response jsonResponse = requestHandler.handleRequest(req);
+                Response jsonResponse = requestHandler.handleRequest(req, session);
 
                 // Send response back to client
                 String responseStr = new Gson().toJson(jsonResponse);
@@ -61,6 +64,11 @@ public class ServerWorker implements Runnable {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
+            // If the session has a logged-in user, log them out
+            if (session.isAuthenticated()) {
+                DBManager.getInstance().logoutUser(session.getUsername());
+            }
+
             try {
                 if (clientSocket != null && clientSocket.isOpen()) {
                     clientSocket.close();
@@ -68,6 +76,7 @@ public class ServerWorker implements Runnable {
                 if (clientIp != null) {
                     System.out.println("Client disconnected: " + clientIp);
                 }
+
             } catch (Exception e) {
                 e.printStackTrace();
             }
