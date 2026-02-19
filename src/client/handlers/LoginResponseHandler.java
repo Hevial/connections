@@ -21,7 +21,7 @@ public class LoginResponseHandler implements ResponseActionHandler {
         String msg = statusCode.toString() + " (" + statusCode.getCode() + "), " + message;
 
         // If login failed, clear any stored username and remain in the current menu
-        if (!statusCode.equals(StatusCodes.SUCCESS)) {
+        if (statusCode != StatusCodes.SUCCESS) {
             currentMenu.setUsername(null);
             currentMenu.setLastMessage(msg);
             currentMenu.setCurrAction(null);
