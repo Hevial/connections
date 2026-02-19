@@ -83,12 +83,22 @@ public class DBManager {
      * @return true if the user exists in the cache, the password matches and is not
      *         logged in; false otherwise
      */
-    public boolean loginUser(String username, String password) {
+    public DBStatus loginUser(String username, String password) {
         User user = usersCache.get(username);
-        if (user != null && user.getPassword().equals(password)) {
-            return loggedInUsers.add(username);
+        if (user == null) {
+            return DBStatus.USER_NOT_FOUND;
         }
-        return false;
+
+        if (!user.getPassword().equals(password)) {
+            return DBStatus.WRONG_PASSWORD;
+        }
+
+        if (loggedInUsers.contains(username)) {
+            return DBStatus.USER_ALREADY_LOGGED_IN;
+        }
+
+        loggedInUsers.add(username);
+        return DBStatus.SUCCESS;
     }
 
     /**
