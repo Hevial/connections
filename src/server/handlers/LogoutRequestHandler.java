@@ -19,8 +19,10 @@ public class LogoutRequestHandler implements RequestActionHandler {
             return new Response(Action.LOGOUT, StatusCodes.UNAUTHORIZED, "Logout fallito: utente non autenticato",
                     null);
         }
-        dbManager.logoutUser(session.getUsername());
+
+        dbManager.logoutUser(session.getUserId());
         session.setUsername(null);
+        session.setUserId(null);
         return new Response(Action.LOGOUT, StatusCodes.SUCCESS, "Logout avvenuto con successo", null);
     }
 

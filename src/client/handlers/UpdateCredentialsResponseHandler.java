@@ -1,8 +1,10 @@
 package client.handlers;
 
+import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 
 import client.menus.BaseMenu;
+import models.UpdateCredentials;
 import models.enums.StatusCodes;
 
 public class UpdateCredentialsResponseHandler implements ResponseActionHandler {
@@ -13,11 +15,13 @@ public class UpdateCredentialsResponseHandler implements ResponseActionHandler {
 
         // update username in the menu if the update was successful and the old username
         // matches the current one
-        if (data != null) {
-            String newUsername = data.getAsJsonObject().get("newUsr").getAsString();
-            String oldUsername = data.getAsJsonObject().get("oldUsr").getAsString();
-            if (currentMenu.getUsername() != null && currentMenu.getUsername().equals(oldUsername))
-                currentMenu.setUsername(newUsername);
+        if (statusCode == StatusCodes.SUCCESS && data != null) {
+
+            UpdateCredentials creds = new Gson().fromJson(data, UpdateCredentials.class);
+
+            if (currentMenu.getUsername() != null && currentMenu.getUsername().equals(creds.getOldUsername())) {
+                currentMenu.setUsername(creds.getNewUsername());
+            }
         }
         currentMenu.setLastMessage(msg);
         currentMenu.setCurrAction(null);

@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
+import models.AuthRequest;
 import models.Response;
 import models.User;
 import models.enums.Action;
@@ -59,7 +60,7 @@ public class RegisterRequestHandler implements RequestActionHandler {
 
         // create User object from JSON
         Gson gson = new Gson();
-        User user = gson.fromJson(body, User.class);
+        AuthRequest user = gson.fromJson(body, AuthRequest.class);
         String username = user.getUsername().trim();
         String password = user.getPassword();
 

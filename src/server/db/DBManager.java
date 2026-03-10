@@ -15,12 +15,14 @@ public class DBManager {
 
     private static DBManager instance;
     private DBConfig config;
-    private ConcurrentHashMap<String, User> usersCache;
+    private ConcurrentHashMap<String, User> usersCache; // key: userId, value: User
+    private ConcurrentHashMap<String, String> usernameToId; // key: username, value: userId
     private Set<String> loggedInUsers;
 
     private DBManager() {
         try {
             usersCache = new ConcurrentHashMap<>();
+            usernameToId = new ConcurrentHashMap<>();
             loggedInUsers = ConcurrentHashMap.newKeySet();
             config = DBConfig.loadConfig();
             loadUsers();
@@ -56,7 +58,21 @@ public class DBManager {
      *         user is found
      */
     public User getUserByUsername(String username) {
-        return usersCache.get(username);
+        if (username == null || username.isBlank()) {
+            return null;
+        }
+        String userId = usernameToId.get(username);
+        if (userId == null) {
+            return null;
+        }
+        return usersCache.get(userId);
+    }
+
+    public User getUserById(String userId) {
+        if (userId == null || userId.isBlank()) {
+            return null;
+        }
+        return usersCache.get(userId);
     }
 
     /**
@@ -67,9 +83,14 @@ public class DBManager {
      *         user with the same username already exists
      */
     public synchronized boolean addNewUser(User user) {
-        if (usersCache.putIfAbsent(user.getUsername(), user) != null) {
+        if (usernameToId.containsKey(user.getUsername())) {
             return false; // User already exists
         }
+        if (usersCache.containsKey(user.getUserId())) {
+            return false; // User ID already exists
+        }
+        usersCache.put(user.getUserId(), user);
+        usernameToId.put(user.getUsername(), user.getUserId());
         saveUsers();
         return true;
     }
@@ -84,7 +105,8 @@ public class DBManager {
      *         logged in; false otherwise
      */
     public DBStatus loginUser(String username, String password) {
-        User user = usersCache.get(username);
+        User user = getUserByUsername(username);
+
         if (user == null) {
             return DBStatus.USER_NOT_FOUND;
         }
@@ -93,40 +115,47 @@ public class DBManager {
             return DBStatus.WRONG_PASSWORD;
         }
 
-        if (loggedInUsers.contains(username)) {
-            return DBStatus.USER_ALREADY_LOGGED_IN;
-        }
-
-        loggedInUsers.add(username);
-        return DBStatus.SUCCESS;
+        return loggedInUsers.add(user.getUserId())
+                ? DBStatus.SUCCESS
+                : DBStatus.USER_ALREADY_LOGGED_IN;
     }
 
     /**
      * Logs out a user by removing them from the logged-in users collection.
      *
-     * @param username the username of the user to logout
+     * @param userId the userId of the user to logout
      * @return true if the user was successfully removed from the logged-in users,
      *         false if the user was not found in the logged-in users collection
      */
-    public boolean logoutUser(String username) {
-        return loggedInUsers.remove(username);
+    public synchronized boolean logoutUser(String userId) {
+        if (userId == null || userId.isBlank()) {
+            return false;
+        }
+        return loggedInUsers.remove(userId);
     }
 
     public synchronized DBStatus updateCredentials(String oldUsername, String oldPassword, String newUsername,
             String newPassword) {
-        User oldUser = usersCache.get(oldUsername);
+        User user = getUserByUsername(oldUsername);
 
-        if (oldUser == null)
+        if (user == null) {
             return DBStatus.USER_NOT_FOUND;
+        }
 
-        if (!oldUser.getPassword().equals(oldPassword))
+        if (!user.getPassword().equals(oldPassword)) {
             return DBStatus.WRONG_PASSWORD;
+        }
 
-        if (!oldUsername.equals(newUsername) && usersCache.containsKey(newUsername))
+        if (!oldUsername.equals(newUsername) && usernameToId.containsKey(newUsername)) {
             return DBStatus.USERNAME_ALREADY_EXISTS;
+        }
 
-        usersCache.remove(oldUsername);
-        usersCache.put(newUsername, new User(newUsername, newPassword));
+        user.setUsername(newUsername);
+        user.setPassword(newPassword);
+
+        usernameToId.remove(oldUsername);
+        usernameToId.put(newUsername, user.getUserId());
+
         saveUsers();
 
         return DBStatus.SUCCESS;
@@ -156,8 +185,12 @@ public class DBManager {
         try (FileReader reader = new FileReader(config.getUsersPath())) {
             Gson gson = new Gson();
             User[] usersArray = gson.fromJson(reader, User[].class);
+            if (usersArray == null) {
+                return;
+            }
             for (User user : usersArray) {
-                usersCache.put(user.getUsername(), user);
+                usersCache.put(user.getUserId(), user);
+                usernameToId.put(user.getUsername(), user.getUserId());
             }
         } catch (Exception e) {
             throw new RuntimeException("Failed to load users from database", e);

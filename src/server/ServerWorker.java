@@ -18,7 +18,7 @@ public class ServerWorker implements Runnable {
     public ServerWorker(RequestHandler requestHandler, SocketChannel clientSocket) {
         this.requestHandler = requestHandler;
         this.clientSocket = clientSocket;
-        this.session = new Session(null); // Initialize session with no user
+        this.session = new Session(null, null); // Initialize session with no user
     }
 
     @Override
@@ -51,6 +51,7 @@ public class ServerWorker implements Runnable {
 
                 // Handle the request and get response
                 Response jsonResponse = requestHandler.handleRequest(req, session);
+                jsonResponse.setSessionUsername(session.getUsername());
 
                 // Send response back to client
                 String responseStr = new Gson().toJson(jsonResponse);
@@ -66,7 +67,7 @@ public class ServerWorker implements Runnable {
         } finally {
             // If the session has a logged-in user, log them out
             if (session.isAuthenticated()) {
-                DBManager.getInstance().logoutUser(session.getUsername());
+                DBManager.getInstance().logoutUser(session.getUserId());
             }
 
             try {

@@ -30,10 +30,26 @@ public class ResponseHandler {
             return currentMenu;
         }
 
+        String previousUsername = currentMenu.getUsername();
         Action action = response.getAction();
         StatusCodes statusCode = response.getStatusCode();
         String message = response.getMessage();
         JsonElement data = response.getData();
+        String sessionUsername = response.getSessionUsername();
+        boolean usernameChangedInBackground = previousUsername != null
+                && sessionUsername != null
+                && !sessionUsername.isBlank()
+                && !previousUsername.equals(sessionUsername)
+                && !(action == Action.UPDATE_CREDENTIALS && statusCode == StatusCodes.SUCCESS);
+
+        if (sessionUsername != null && !sessionUsername.isBlank()) {
+            currentMenu.setUsername(sessionUsername);
+        }
+
+        if (usernameChangedInBackground) {
+            message = message + " | Avviso: username aggiornato da un altro client (" + previousUsername + " -> "
+                    + sessionUsername + ")";
+        }
 
         ResponseActionHandler handler = actionHandlers.get(action);
         if (handler == null) {

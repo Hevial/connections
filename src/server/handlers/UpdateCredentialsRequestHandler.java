@@ -4,8 +4,9 @@ import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
+import models.AuthRequest;
 import models.Response;
-import models.User;
+import models.UpdateCredentials;
 import models.enums.Action;
 import models.enums.StatusCodes;
 import server.Session;
@@ -31,8 +32,8 @@ public class UpdateCredentialsRequestHandler implements RequestActionHandler {
 
         // Estrarre i dati dal JsonElement
         Gson gson = new Gson();
-        User oldUser = gson.fromJson(body.get("oldUser"), User.class);
-        User newUser = gson.fromJson(body.get("newUser"), User.class);
+        AuthRequest oldUser = gson.fromJson(body.get("oldUser"), AuthRequest.class);
+        AuthRequest newUser = gson.fromJson(body.get("newUser"), AuthRequest.class);
         String oldUsername = oldUser.getUsername().trim();
         String oldPassword = oldUser.getPassword();
         String newUsername = newUser.getUsername().trim();
@@ -40,7 +41,7 @@ public class UpdateCredentialsRequestHandler implements RequestActionHandler {
         // Validate that username and password are not empty
         if (oldUsername.isEmpty() || oldPassword.isEmpty() || newUsername.isEmpty() || newPassword.isEmpty()) {
             return new Response(Action.UPDATE_CREDENTIALS, StatusCodes.BAD_REQUEST,
-                    "Errore: username e password non possono essere vuoti", null);
+                    "Errore: username e/o password non possono essere vuoti", null);
         }
 
         DBManager dbManager = DBManager.getInstance();
@@ -50,9 +51,8 @@ public class UpdateCredentialsRequestHandler implements RequestActionHandler {
 
             switch (status) {
                 case SUCCESS:
-                    JsonElement resData = new JsonObject();
-                    resData.getAsJsonObject().addProperty("newUsr", newUsername);
-                    resData.getAsJsonObject().addProperty("oldUsr", oldUsername);
+                    JsonElement resData = gson.toJsonTree(new UpdateCredentials(oldUsername, newUsername));
+
                     if (session.isAuthenticated() && session.getUsername().equals(oldUsername)) {
                         session.setUsername(newUsername);
                     }

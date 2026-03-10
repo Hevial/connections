@@ -4,8 +4,8 @@ import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
+import models.AuthRequest;
 import models.Response;
-import models.User;
 import models.enums.Action;
 import models.enums.StatusCodes;
 import server.Session;
@@ -51,7 +51,7 @@ public class LoginRequestHandler implements RequestActionHandler {
 
         // create User object from JSON
         Gson gson = new Gson();
-        User user = gson.fromJson(body, User.class);
+        AuthRequest user = gson.fromJson(body, AuthRequest.class);
         String username = user.getUsername().trim();
         String password = user.getPassword();
 
@@ -78,6 +78,7 @@ public class LoginRequestHandler implements RequestActionHandler {
                             "Login failed: User already logged in", null);
                 case SUCCESS:
                     session.setUsername(username);
+                    session.setUserId(dbManager.getUserByUsername(username).getUserId());
                     // TODO: get actual game data for the user
                     JsonObject gameData = new JsonObject();
                     gameData.addProperty("message", "Welcome back, " + username + "!");
@@ -88,6 +89,7 @@ public class LoginRequestHandler implements RequestActionHandler {
                             "Login failed: Server error", null);
             }
         } catch (Exception e) {
+            System.err.println("Error during login: " + e.getMessage());
             return new Response(Action.LOGIN, StatusCodes.INTERNAL_SERVER_ERROR,
                     "Login failed: Server error", null);
         }

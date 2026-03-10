@@ -8,8 +8,8 @@ import java.util.function.Supplier;
 
 import com.google.gson.JsonElement;
 
+import models.AuthRequest;
 import models.Request;
-import models.User;
 import models.enums.Action;
 
 public class MainMenu extends BaseMenu {
@@ -51,15 +51,15 @@ public class MainMenu extends BaseMenu {
 
     private Request buildRegisterRequest() {
         setCurrAction("REGISTRAZIONE");
-        User user = requestCredentials("Username: ", "Password: ");
-        JsonElement data = gson.toJsonTree(user, User.class);
+        AuthRequest user = requestCredentials("Username: ", "Password: ");
+        JsonElement data = gson.toJsonTree(user, AuthRequest.class);
         return new Request(Action.REGISTER, data);
     }
 
     private Request buildLoginRequest() {
         setCurrAction("LOGIN");
-        User user = requestCredentials("Username: ", "Password: ");
-        JsonElement data = gson.toJsonTree(user, User.class);
+        AuthRequest user = requestCredentials("Username: ", "Password: ");
+        JsonElement data = gson.toJsonTree(user, AuthRequest.class);
         return new Request(Action.LOGIN, data);
     }
 

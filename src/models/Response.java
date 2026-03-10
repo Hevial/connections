@@ -10,12 +10,14 @@ public class Response {
     private StatusCodes statusCode;
     private String message;
     private JsonElement data;
+    private String sessionUsername;
 
     public Response(Action action, StatusCodes statusCode, String message, JsonElement data) {
         this.action = action;
         this.statusCode = statusCode;
         this.message = message;
         this.data = data;
+        this.sessionUsername = null;
     }
 
     public Action getAction() {
@@ -32,5 +34,13 @@ public class Response {
 
     public JsonElement getData() {
         return data;
+    }
+
+    public String getSessionUsername() {
+        return sessionUsername;
+    }
+
+    public void setSessionUsername(String sessionUsername) {
+        this.sessionUsername = sessionUsername;
     }
 }

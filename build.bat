@@ -4,6 +4,7 @@ setlocal
 rem Configura versione Gson qui (modifica se necessario)
 set GSON_VERSION=2.13.2
 set GSON_JAR=lib\gson-%GSON_VERSION%.jar
+set JAVA_RELEASE=24
 
 rem Crea cartella lib se non esiste
 if not exist lib (
@@ -22,7 +23,7 @@ if not exist "%GSON_JAR%" (
 )
 
 echo Compiling...
-javac -d bin -cp "%GSON_JAR%" src\models\*.java src\server\*.java src\server\handlers\*.java src\server\db\*.java src\client\*.java src\client\handlers\*.java src\client\menus\*.java src\models\enums\*.java
+javac --release %JAVA_RELEASE% -d bin -cp "%GSON_JAR%" src\models\*.java src\server\*.java src\server\handlers\*.java src\server\db\*.java src\client\*.java src\client\handlers\*.java src\client\menus\*.java src\models\enums\*.java
 if %errorlevel% == 0 (
     echo Build successful!
 ) else (

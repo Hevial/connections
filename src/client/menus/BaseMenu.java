@@ -7,6 +7,7 @@ import java.util.function.Supplier;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 
+import models.AuthRequest;
 import models.Request;
 import models.User;
 import models.enums.Action;
@@ -122,8 +123,15 @@ public abstract class BaseMenu {
 
     public Request buildUpdateCredentialsRequest() {
         setCurrAction("AGGIORNA CREDENZIALI");
-        User oldUser = requestCredentials("Vecchio Username: ", "Vecchia Password: ");
-        User newUser = requestCredentials("Nuovo Username: ", "Nuova Password: ");
+        AuthRequest oldUser = requestCredentials("Vecchio Username: ", "Vecchia Password: ");
+        AuthRequest newUser = requestCredentials("Nuovo Username: ", "Nuova Password: ");
+
+        if (newUser.getUsername().isBlank() && !newUser.getPassword().isBlank())
+            newUser.setUsername(oldUser.getUsername());
+
+        if (newUser.getPassword().isBlank() && !newUser.getUsername().isBlank())
+            newUser.setPassword(oldUser.getPassword());
+
         JsonElement data = gson.toJsonTree(Map.of("oldUser", oldUser, "newUser", newUser));
         return new Request(Action.UPDATE_CREDENTIALS, data);
     }
@@ -195,13 +203,13 @@ public abstract class BaseMenu {
      * @param passwordPrompt the prompt message for the password input
      * @return a {@link User} object containing the entered username and password
      */
-    protected User requestCredentials(String usernamePrompt, String passwordPrompt) {
+    protected AuthRequest requestCredentials(String usernamePrompt, String passwordPrompt) {
         resetScreen();
         System.out.print("╠ " + usernamePrompt);
         String username = scanner.nextLine();
         System.out.print("╠ " + passwordPrompt);
         String password = scanner.nextLine();
-        return new User(username, password);
+        return new AuthRequest(username, password);
     }
 
     protected void clearScreen() {
