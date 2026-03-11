@@ -8,7 +8,9 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.stream.JsonReader;
 
+import models.Game;
 import models.User;
 
 public class DBManager {
@@ -18,6 +20,7 @@ public class DBManager {
     private ConcurrentHashMap<String, User> usersCache; // key: userId, value: User
     private ConcurrentHashMap<String, String> usernameToId; // key: username, value: userId
     private Set<String> loggedInUsers;
+    private int gameIndex;
 
     private DBManager() {
         try {
@@ -214,6 +217,30 @@ public class DBManager {
             gson.toJson(usersCache.values(), writer);
         } catch (Exception e) {
             throw new RuntimeException("Failed to save users from database", e);
+        }
+    }
+
+    synchronized public Game getNextGame() {
+        try (JsonReader jsonReader = new JsonReader(new FileReader(config.getGamesPath()))) {
+            Gson gson = new Gson();
+            jsonReader.beginArray();
+
+            int currentIndex = 0;
+            while (jsonReader.hasNext()) {
+                if (currentIndex == gameIndex) {
+                    gameIndex++;
+                    return gson.fromJson(jsonReader, Game.class);
+                }
+                jsonReader.skipValue();
+                currentIndex++;
+            }
+
+            jsonReader.endArray();
+            gameIndex = 0;
+            return getNextGame();
+
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to load games from database", e);
         }
     }
 
