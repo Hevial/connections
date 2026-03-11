@@ -19,14 +19,16 @@ public class DBManager {
     private DBConfig config;
     private ConcurrentHashMap<String, User> usersCache; // key: userId, value: User
     private ConcurrentHashMap<String, String> usernameToId; // key: username, value: userId
-    private Set<String> loggedInUsers;
-    private int gameIndex;
+    private Set<String> loggedInUsers; // Set of userIds representing currently logged-in users
+    private Gson gson;
+    private JsonReader gamesJsonReader; // Used for streaming read of games
 
     private DBManager() {
         try {
             usersCache = new ConcurrentHashMap<>();
             usernameToId = new ConcurrentHashMap<>();
             loggedInUsers = ConcurrentHashMap.newKeySet();
+            gson = new Gson();
             config = DBConfig.loadConfig();
             loadUsers();
 
@@ -220,27 +222,56 @@ public class DBManager {
         }
     }
 
+    /**
+     * Loads the next game from the games JSON file using a persistent streaming
+     * reader.
+     * <p>
+     * If the reader has not been opened yet or has reached the end of the array,
+     * the games file is reopened from the beginning.
+     *
+     * @return the next available game, or null if the file contains no games
+     */
     synchronized public Game loadNextGame() {
-        try (JsonReader jsonReader = new JsonReader(new FileReader(config.getGamesPath()))) {
-            Gson gson = new Gson();
-            jsonReader.beginArray();
-
-            int currentIndex = 0;
-            while (jsonReader.hasNext()) {
-                if (currentIndex == gameIndex) {
-                    gameIndex++;
-                    return gson.fromJson(jsonReader, Game.class);
-                }
-                jsonReader.skipValue();
-                currentIndex++;
+        try {
+            if (gamesJsonReader == null || !gamesJsonReader.hasNext()) {
+                openGamesReader();
             }
 
-            jsonReader.endArray();
-            gameIndex = 0;
-            return loadNextGame();
-
+            return gamesJsonReader.hasNext()
+                    ? gson.fromJson(gamesJsonReader, Game.class)
+                    : null;
         } catch (Exception e) {
+            closeGamesReader();
             throw new RuntimeException("Failed to load games from database", e);
+        }
+    }
+
+    /**
+     * Opens the games file reader from the beginning of the JSON array.
+     * <p>
+     * If a reader is already open, it is closed before creating the new one.
+     *
+     * @throws Exception if the games file cannot be opened or parsed
+     */
+
+    private void openGamesReader() throws Exception {
+        closeGamesReader();
+        gamesJsonReader = new JsonReader(new FileReader(config.getGamesPath()));
+        gamesJsonReader.beginArray();
+    }
+
+    /**
+     * Closes the current games reader and clears the associated reference.
+     */
+    private void closeGamesReader() {
+        try {
+            if (gamesJsonReader != null) {
+                gamesJsonReader.close();
+            }
+        } catch (Exception e) {
+            // Ignore cleanup errors, the reader is being recreated anyway.
+        } finally {
+            gamesJsonReader = null;
         }
     }
 

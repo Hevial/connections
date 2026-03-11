@@ -5,6 +5,8 @@ import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import server.handlers.RequestHandler;
 
@@ -23,11 +25,15 @@ public class ServerMain {
     private static void startServer(ServerConfig config) {
         try (ServerSocketChannel serverSocket = ServerSocketChannel.open()) {
             serverSocket.bind(new InetSocketAddress(config.getHost(), config.getPort()));
+            System.out.println("Server configuration loaded successfully:");
             System.out.println("Server started on port " + serverSocket.getLocalAddress());
             System.out.println("Host: " + config.getHost());
-            System.out.println("Game Duration: " + config.getGameDuration() + "s");
+            System.out.println("Game Duration: " + config.getGameDuration() + "s\n\n");
 
             ExecutorService executor = Executors.newCachedThreadPool();
+            ScheduledExecutorService gameExecutorService = Executors.newSingleThreadScheduledExecutor();
+            gameExecutorService.scheduleWithFixedDelay(new GameManager(config.getGameDuration()), 0,
+                    config.getGameDuration(), TimeUnit.SECONDS);
 
             while (true) {
                 // Wait for a client to connect
