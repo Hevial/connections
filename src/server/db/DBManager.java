@@ -220,7 +220,7 @@ public class DBManager {
         }
     }
 
-    synchronized public Game getNextGame() {
+    synchronized public Game loadNextGame() {
         try (JsonReader jsonReader = new JsonReader(new FileReader(config.getGamesPath()))) {
             Gson gson = new Gson();
             jsonReader.beginArray();
@@ -237,7 +237,7 @@ public class DBManager {
 
             jsonReader.endArray();
             gameIndex = 0;
-            return getNextGame();
+            return loadNextGame();
 
         } catch (Exception e) {
             throw new RuntimeException("Failed to load games from database", e);
