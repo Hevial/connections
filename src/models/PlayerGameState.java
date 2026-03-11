@@ -1,7 +1,7 @@
 package models;
 
-import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class PlayerGameState {
 
@@ -10,13 +10,16 @@ public class PlayerGameState {
 
     private int mistakes;
     private int score;
-    private boolean hasWon;
-    private Map<String, Group> groupsFound;
+    private boolean isWinner;
+    private boolean isComplete;
+    private Map<Set<String>, String> groupsFound;
 
     public PlayerGameState() {
         this.mistakes = 0;
         this.score = 0;
-        this.hasWon = false;
+        this.isWinner = false;
+        this.isComplete = false;
+        this.groupsFound = Map.of(); // Initialize with an empty map
     }
 
     public int getMistakes() {
@@ -27,12 +30,20 @@ public class PlayerGameState {
         return score;
     }
 
-    public boolean isHasWon() {
-        return hasWon;
+    public boolean isWinner() {
+        return isWinner;
     }
 
-    public void setHasWon(boolean hasWon) {
-        this.hasWon = hasWon;
+    public void setWinner(boolean isWinner) {
+        this.isWinner = isWinner;
+    }
+
+    public boolean isComplete() {
+        return isComplete;
+    }
+
+    public void setComplete(boolean isComplete) {
+        this.isComplete = isComplete;
     }
 
     /**
@@ -63,12 +74,12 @@ public class PlayerGameState {
         score -= POINTS_PER_MISTAKE;
     }
 
-    public List<Group> getGroupsFound() {
-        return List.copyOf(groupsFound.values());
+    public Map<Set<String>, String> getGroupsFound() {
+        return Map.copyOf(groupsFound);
     }
 
-    public void addGroupFound(Group group) {
-        groupsFound.put(group.getTheme(), group);
+    public void addGroupFound(String theme, Set<String> words) {
+        groupsFound.put(words, theme);
     }
 
 }
