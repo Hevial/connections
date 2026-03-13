@@ -4,6 +4,8 @@ import java.time.Instant;
 import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * Represents the runtime state of a game session.
@@ -46,6 +48,23 @@ public class GameState {
      */
     public int getGameId() {
         return game.getGameId();
+    }
+
+    /**
+     * Returns a shuffled list of all words from the game.
+     * <p>
+     * This method retrieves all words using {@code game.getAllWords()},
+     * shuffles the list in-place to randomize the order, and returns the shuffled
+     * list.
+     * </p>
+     *
+     * @return a {@code List<String>} containing all words from the game in random
+     *         order
+     */
+    public List<String> getAllWordsShuffled() {
+        List<String> shuffledWords = game.getAllWords();
+        Collections.shuffle(shuffledWords);
+        return shuffledWords;
     }
 
     /**
