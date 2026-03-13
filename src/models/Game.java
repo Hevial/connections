@@ -1,5 +1,6 @@
 package models;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -58,9 +59,18 @@ public class Game {
         return null;
     }
 
+    /**
+     * Retrieves a list of all words from all groups in the game.
+     *
+     * @return a list containing all words from every group, the list is immutable
+     */
     public List<String> getAllWords() {
-        return groups.stream()
-                .flatMap(group -> group.getWords().stream())
-                .toList();
+        List<String> allWords = new ArrayList<>();
+
+        for (Group group : groups) {
+            allWords.addAll(group.getWords());
+        }
+
+        return List.copyOf(allWords);
     }
 }
