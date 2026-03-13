@@ -20,6 +20,7 @@ public class RequestHandler {
     public RequestHandler(GameManager gameManager) {
         actionHandlers = new EnumMap<>(Action.class);
         actionHandlers.put(Action.LOGIN, new LoginRequestHandler(gameManager));
+        actionHandlers.put(Action.GAME_STATUS, new GamestatusRequestHandler(gameManager));
         actionHandlers.put(Action.REGISTER, new RegisterRequestHandler());
         actionHandlers.put(Action.UPDATE_CREDENTIALS, new UpdateCredentialsRequestHandler());
         actionHandlers.put(Action.LOGOUT, new LogoutRequestHandler());

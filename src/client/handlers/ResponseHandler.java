@@ -21,6 +21,7 @@ public class ResponseHandler {
         this.actionHandlers.put(Action.LOGIN, new LoginResponseHandler(scanner));
         this.actionHandlers.put(Action.UPDATE_CREDENTIALS, new UpdateCredentialsResponseHandler());
         this.actionHandlers.put(Action.LOGOUT, new LogoutResponseHandler(scanner));
+        this.actionHandlers.put(Action.GAME_STATUS, new GamestatusResponseHandler());
     }
 
     public BaseMenu handleResponse(Response response, BaseMenu currentMenu) {
@@ -55,6 +56,7 @@ public class ResponseHandler {
         if (handler == null) {
             System.err.println("Unknown action in response: " + action);
             currentMenu.setLastMessage("Handler non trovato per l'azione: " + action);
+            currentMenu.setCurrAction(null);
             return currentMenu;
         }
 
