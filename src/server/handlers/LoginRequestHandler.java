@@ -109,6 +109,7 @@ public class LoginRequestHandler implements RequestActionHandler {
             }
         } catch (Exception e) {
             System.err.println("Error during login: " + e.getMessage());
+            e.printStackTrace();
             return new Response(Action.LOGIN, StatusCodes.INTERNAL_SERVER_ERROR,
                     "Login failed: Server error", null);
         }
