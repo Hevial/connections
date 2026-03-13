@@ -1,5 +1,8 @@
 package models;
 
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -8,18 +11,24 @@ public class PlayerGameState {
     private static final int POINTS_PER_SUCCESS = 6;
     private static final int POINTS_PER_MISTAKE = 4;
 
+    private int gameId;
     private int mistakes;
     private int score;
     private boolean isWinner;
     private boolean isComplete;
     private Map<Set<String>, String> groupsFound;
+    private List<String> wordsLeft;
+    private String timeLeft;
 
-    public PlayerGameState() {
+    public PlayerGameState(int gameId, List<String> wordsLeft, String timeLeft) {
+        this.gameId = gameId;
         this.mistakes = 0;
         this.score = 0;
         this.isWinner = false;
         this.isComplete = false;
-        this.groupsFound = Map.of(); // Initialize with an empty map
+        this.groupsFound = new LinkedHashMap<>();
+        this.wordsLeft = new ArrayList<>(wordsLeft);
+        this.timeLeft = timeLeft;
     }
 
     public int getMistakes() {
@@ -79,7 +88,31 @@ public class PlayerGameState {
     }
 
     public void addGroupFound(String theme, Set<String> words) {
-        groupsFound.put(words, theme);
+        groupsFound.put(Set.copyOf(words), theme);
+    }
+
+    public List<String> getWordsLeft() {
+        return List.copyOf(wordsLeft);
+    }
+
+    public void setWordsLeft(List<String> wordsLeft) {
+        this.wordsLeft = new ArrayList<>(wordsLeft);
+    }
+
+    public String getTimeLeft() {
+        return timeLeft;
+    }
+
+    public void setTimeLeft(String timeLeft) {
+        this.timeLeft = timeLeft;
+    }
+
+    public int getGameId() {
+        return gameId;
+    }
+
+    public void setGameId(int gameId) {
+        this.gameId = gameId;
     }
 
 }

@@ -57,4 +57,10 @@ public class Game {
         }
         return null;
     }
+
+    public List<String> getAllWords() {
+        return groups.stream()
+                .flatMap(group -> group.getWords().stream())
+                .toList();
+    }
 }

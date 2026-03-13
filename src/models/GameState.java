@@ -35,8 +35,17 @@ public class GameState {
      *
      * @return the current game
      */
-    public Game setGame() {
+    public Game getGame() {
         return game;
+    }
+
+    /**
+     * Returns the id of the current game associated with this state.
+     *
+     * @return current game id
+     */
+    public int getGameId() {
+        return game.getGameId();
     }
 
     /**
