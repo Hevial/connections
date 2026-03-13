@@ -14,7 +14,7 @@ public class UserMenu extends BaseMenu {
         super(scanner);
         this.requestBuilders = Map.of(
                 1, requestBuilder::buildMakeProposalRequest,
-                2, requestBuilder::buildGameInfoRequest,
+                2, requestBuilder::buildGameStatusRequest,
                 3, requestBuilder::buildGameStatsRequest,
                 4, requestBuilder::buildPersonalStatsRequest,
                 5, requestBuilder::buildLeaderboardRequest,
@@ -42,7 +42,7 @@ public class UserMenu extends BaseMenu {
     protected Map<Integer, String> getMenuOptions() {
         Map<Integer, String> options = new LinkedHashMap<>();
         options.put(1, "Fai Proposta");
-        options.put(2, "Informazioni Partita");
+        options.put(2, "Stato Partita");
         options.put(3, "Statistiche Partita");
         options.put(4, "Statistiche Personali");
         options.put(5, "Classifica");

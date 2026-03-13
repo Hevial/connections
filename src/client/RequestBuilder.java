@@ -93,8 +93,9 @@ public class RequestBuilder {
         return new Request(Action.UPDATE_CREDENTIALS, data);
     }
 
-    public Request buildGameInfoRequest() {
-        return new Request(Action.GAME_INFO, null);
+    public Request buildGameStatusRequest() {
+        menu.setCurrAction(MenuAction.REQUEST_GAME_STATUS.getDisplayName());
+        return new Request(Action.GAME_STATUS, null);
     }
 
     public Request buildGameStatsRequest() {
