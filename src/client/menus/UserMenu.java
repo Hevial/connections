@@ -2,10 +2,8 @@ package client.menus;
 
 import java.util.Scanner;
 import java.util.function.Supplier;
-
 import models.Request;
 
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -14,14 +12,20 @@ public class UserMenu extends BaseMenu {
 
     public UserMenu(Scanner scanner) {
         super(scanner);
-        this.requestBuilders = new HashMap<>();
-        this.requestBuilders.put(5, this::buildUpdateCredentialsRequest);
-        this.requestBuilders.put(6, this::buildLogoutRequest);
-        this.requestBuilders.put(0, () -> {
-            clearScreen();
-            System.exit(0);
-            return null;
-        }); // Exit action, will terminate the program
+        this.requestBuilders = Map.of(
+                1, requestBuilder::buildMakeProposalRequest,
+                2, requestBuilder::buildGameInfoRequest,
+                3, requestBuilder::buildGameStatsRequest,
+                4, requestBuilder::buildPersonalStatsRequest,
+                5, requestBuilder::buildLeaderboardRequest,
+                6, requestBuilder::buildUpdateCredentialsRequest,
+                7, requestBuilder::buildLogoutRequest,
+                0, () -> {
+                    clearScreen();
+                    System.exit(0);
+                    return null;
+                } // Exit action, will terminate the program
+        );
     }
 
     @Override
@@ -40,15 +44,12 @@ public class UserMenu extends BaseMenu {
         options.put(1, "Fai Proposta");
         options.put(2, "Informazioni Partita");
         options.put(3, "Statistiche Partita");
-        options.put(4, "Statistiche Globali");
-        options.put(5, "Aggiorna Credenziali");
-        options.put(6, "Logout");
+        options.put(4, "Statistiche Personali");
+        options.put(5, "Classifica");
+        options.put(6, "Aggiorna Credenziali");
+        options.put(7, "Logout");
         options.put(0, "Esci");
         return options;
-    }
-
-    private Request buildLogoutRequest() {
-        return new Request(models.enums.Action.LOGOUT, null);
     }
 
 }

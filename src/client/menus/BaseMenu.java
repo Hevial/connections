@@ -4,14 +4,9 @@ import java.util.Map;
 import java.util.Scanner;
 import java.util.function.Supplier;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonElement;
-
+import client.RequestBuilder;
 import models.AuthRequest;
 import models.Request;
-import models.User;
-import models.enums.Action;
-import models.enums.MenuAction;
 
 /**
  * BaseMenu is an abstract class that provides a foundation for implementing
@@ -39,6 +34,7 @@ import models.enums.MenuAction;
 public abstract class BaseMenu {
 
     protected final Scanner scanner;
+    protected final RequestBuilder requestBuilder;
 
     // Session and display state
     protected String lastMessage;
@@ -47,10 +43,9 @@ public abstract class BaseMenu {
     protected String gameData;
     protected boolean shouldShowGameData;
 
-    protected Gson gson = new Gson();
-
     protected BaseMenu(Scanner scanner) {
         this.scanner = scanner;
+        this.requestBuilder = new RequestBuilder(this);
     }
 
     /* Getters and Setters */
@@ -131,19 +126,23 @@ public abstract class BaseMenu {
         }
     }
 
-    public Request buildUpdateCredentialsRequest() {
-        setCurrAction(MenuAction.UPDATE_CREDENTIALS.getDisplayName());
-        AuthRequest oldUser = requestCredentials("Vecchio Username: ", "Vecchia Password: ");
-        AuthRequest newUser = requestCredentials("Nuovo Username: ", "Nuova Password: ");
-
-        if (newUser.getUsername().isBlank() && !newUser.getPassword().isBlank())
-            newUser.setUsername(oldUser.getUsername());
-
-        if (newUser.getPassword().isBlank() && !newUser.getUsername().isBlank())
-            newUser.setPassword(oldUser.getPassword());
-
-        JsonElement data = gson.toJsonTree(Map.of("oldUser", oldUser, "newUser", newUser));
-        return new Request(Action.UPDATE_CREDENTIALS, data);
+    /**
+     * Prompts the user for credentials using the provided username and password
+     * prompts,
+     * reads the input from the console, and returns a {@link User} object with the
+     * entered values.
+     *
+     * @param usernamePrompt the prompt message for the username input
+     * @param passwordPrompt the prompt message for the password input
+     * @return a {@link User} object containing the entered username and password
+     */
+    public AuthRequest requestCredentials(String usernamePrompt, String passwordPrompt) {
+        resetScreen();
+        System.out.print("╠ " + usernamePrompt);
+        String username = scanner.nextLine();
+        System.out.print("╠ " + passwordPrompt);
+        String password = scanner.nextLine();
+        return new AuthRequest(username, password);
     }
 
     /* Template Methods for Menu Display */
@@ -214,25 +213,6 @@ public abstract class BaseMenu {
     }
 
     /* Utility Methods */
-
-    /**
-     * Prompts the user for credentials using the provided username and password
-     * prompts,
-     * reads the input from the console, and returns a {@link User} object with the
-     * entered values.
-     *
-     * @param usernamePrompt the prompt message for the username input
-     * @param passwordPrompt the prompt message for the password input
-     * @return a {@link User} object containing the entered username and password
-     */
-    protected AuthRequest requestCredentials(String usernamePrompt, String passwordPrompt) {
-        resetScreen();
-        System.out.print("╠ " + usernamePrompt);
-        String username = scanner.nextLine();
-        System.out.print("╠ " + passwordPrompt);
-        String password = scanner.nextLine();
-        return new AuthRequest(username, password);
-    }
 
     protected void clearScreen() {
         String os = System.getProperty("os.name").toLowerCase();

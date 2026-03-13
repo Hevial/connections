@@ -1,17 +1,11 @@
 package client.menus;
 
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Scanner;
 import java.util.function.Supplier;
 
-import com.google.gson.JsonElement;
-
-import models.AuthRequest;
 import models.Request;
-import models.enums.Action;
-import models.enums.MenuAction;
 
 public class MainMenu extends BaseMenu {
 
@@ -19,15 +13,16 @@ public class MainMenu extends BaseMenu {
 
     public MainMenu(Scanner scanner) {
         super(scanner);
-        this.requestBuilders = new HashMap<>();
-        this.requestBuilders.put(1, this::buildLoginRequest);
-        this.requestBuilders.put(2, this::buildRegisterRequest);
-        this.requestBuilders.put(3, this::buildUpdateCredentialsRequest);
-        this.requestBuilders.put(0, () -> {
-            clearScreen();
-            System.exit(0);
-            return null;
-        }); // Exit action, will terminate the program
+        this.requestBuilders = Map.of(
+                1, requestBuilder::buildLoginRequest,
+                2, requestBuilder::buildRegisterRequest,
+                3, requestBuilder::buildUpdateCredentialsRequest,
+                0, () -> {
+                    clearScreen();
+                    System.exit(0);
+                    return null;
+                } // Exit action, will terminate the program
+        );
     }
 
     @Override
@@ -48,20 +43,6 @@ public class MainMenu extends BaseMenu {
         options.put(3, "Aggiorna Credenziali");
         options.put(0, "Esci");
         return options;
-    }
-
-    private Request buildRegisterRequest() {
-        setCurrAction(MenuAction.REGISTER.getDisplayName());
-        AuthRequest user = requestCredentials("Username: ", "Password: ");
-        JsonElement data = gson.toJsonTree(user, AuthRequest.class);
-        return new Request(Action.REGISTER, data);
-    }
-
-    private Request buildLoginRequest() {
-        setCurrAction(MenuAction.LOGIN.getDisplayName());
-        AuthRequest user = requestCredentials("Username: ", "Password: ");
-        JsonElement data = gson.toJsonTree(user, AuthRequest.class);
-        return new Request(Action.LOGIN, data);
     }
 
 }
