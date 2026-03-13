@@ -4,6 +4,7 @@ import java.time.Instant;
 import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -62,7 +63,7 @@ public class GameState {
      *         order
      */
     public List<String> getAllWordsShuffled() {
-        List<String> shuffledWords = game.getAllWords();
+        List<String> shuffledWords = new ArrayList<>(game.getAllWords());
         Collections.shuffle(shuffledWords);
         return shuffledWords;
     }
