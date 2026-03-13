@@ -13,6 +13,48 @@ import com.google.gson.stream.JsonReader;
 import models.Game;
 import models.User;
 
+/**
+ * DBManager is a singleton class responsible for managing user and game data in
+ * the application.
+ * <p>
+ * It provides thread-safe operations for user authentication, registration,
+ * credential updates,
+ * and session management, as well as for loading and saving user data to
+ * persistent storage.
+ * The class also supports streaming access to game data from a JSON file.
+ * </p>
+ *
+ * <h2>Responsibilities:</h2>
+ * <ul>
+ * <li>Maintains an in-memory cache of users and their login states.</li>
+ * <li>Handles user registration, authentication, and credential updates.</li>
+ * <li>Persists user data to and loads user data from a JSON file.</li>
+ * <li>Provides streaming access to game data from a JSON file.</li>
+ * <li>Ensures thread-safe access and modification of user and game data.</li>
+ * </ul>
+ *
+ * <h2>Usage:</h2>
+ * 
+ * <pre>
+ * DBManager dbManager = DBManager.getInstance();
+ * DBStatus status = dbManager.loginUser("username", "password");
+ * // ... other operations
+ * </pre>
+ *
+ * <h2>Thread Safety:</h2>
+ * <p>
+ * Most public methods are thread-safe, using synchronization or concurrent
+ * collections
+ * to ensure data consistency in a multi-threaded environment.
+ * </p>
+ *
+ * <h2>Persistence:</h2>
+ * <p>
+ * User data is persisted as JSON to a file specified in the configuration.
+ * Game data is read from a JSON file using a streaming reader for efficiency.
+ * </p>
+ *
+ */
 public class DBManager {
 
     private static DBManager instance;
