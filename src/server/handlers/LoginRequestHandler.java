@@ -5,9 +5,12 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 import models.AuthRequest;
+import models.GameState;
+import models.PlayerGameState;
 import models.Response;
 import models.enums.Action;
 import models.enums.StatusCodes;
+import server.GameManager;
 import server.Session;
 import server.db.DBManager;
 import server.db.DBStatus;
@@ -32,6 +35,12 @@ import server.db.DBStatus;
  * </p>
  */
 public class LoginRequestHandler implements RequestActionHandler {
+
+    private final GameManager gameManager;
+
+    public LoginRequestHandler(GameManager gameManager) {
+        this.gameManager = gameManager;
+    }
 
     @Override
     public Response handle(JsonElement data, Session session) {
@@ -79,10 +88,20 @@ public class LoginRequestHandler implements RequestActionHandler {
                 case SUCCESS:
                     session.setUsername(username);
                     session.setUserId(dbManager.getUserByUsername(username).getUserId());
-                    // TODO: get actual game data for the user
                     JsonObject gameData = new JsonObject();
                     gameData.addProperty("message", "Welcome back, " + username + "!");
                     gameData.addProperty("username", username);
+
+                    GameState gameState = gameManager.getCurrentGameState();
+                    if (gameState == null || gameState.getGame() == null) {
+                        return new Response(Action.LOGIN, StatusCodes.INTERNAL_SERVER_ERROR,
+                                "Login failed: No active game available", null);
+                    }
+
+                    PlayerGameState playerGameState = gameManager.getOrCreatePlayerState(session.getUserId());
+
+                    gameData.add("playerGameState", gson.toJsonTree(playerGameState));
+
                     return new Response(Action.LOGIN, StatusCodes.SUCCESS, "Login successful", gameData);
                 default:
                     return new Response(Action.LOGIN, StatusCodes.INTERNAL_SERVER_ERROR,

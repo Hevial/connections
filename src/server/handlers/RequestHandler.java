@@ -10,15 +10,16 @@ import models.Response;
 import models.User;
 import models.enums.Action;
 import models.enums.StatusCodes;
+import server.GameManager;
 import server.Session;
 import server.db.DBManager;
 
 public class RequestHandler {
     private final Map<Action, RequestActionHandler> actionHandlers;
 
-    public RequestHandler() {
+    public RequestHandler(GameManager gameManager) {
         actionHandlers = new EnumMap<>(Action.class);
-        actionHandlers.put(Action.LOGIN, new LoginRequestHandler());
+        actionHandlers.put(Action.LOGIN, new LoginRequestHandler(gameManager));
         actionHandlers.put(Action.REGISTER, new RegisterRequestHandler());
         actionHandlers.put(Action.UPDATE_CREDENTIALS, new UpdateCredentialsRequestHandler());
         actionHandlers.put(Action.LOGOUT, new LogoutRequestHandler());

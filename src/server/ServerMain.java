@@ -32,7 +32,8 @@ public class ServerMain {
 
             ExecutorService executor = Executors.newCachedThreadPool();
             ScheduledExecutorService gameExecutorService = Executors.newSingleThreadScheduledExecutor();
-            gameExecutorService.scheduleWithFixedDelay(new GameManager(config.getGameDuration()), 0,
+            GameManager gameManager = new GameManager(config.getGameDuration());
+            gameExecutorService.scheduleWithFixedDelay(gameManager, 0,
                     config.getGameDuration(), TimeUnit.SECONDS);
 
             while (true) {
@@ -41,7 +42,7 @@ public class ServerMain {
                 System.out.println("Client connected: " + clientSocket.getRemoteAddress());
 
                 // Handle the client connection in a separate thread
-                executor.execute(new ServerWorker(new RequestHandler(), clientSocket));
+                executor.execute(new ServerWorker(new RequestHandler(gameManager), clientSocket));
             }
         } catch (Exception e) {
             e.printStackTrace();
