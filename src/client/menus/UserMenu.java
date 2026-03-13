@@ -50,4 +50,5 @@ public class UserMenu extends BaseMenu {
     private Request buildLogoutRequest() {
         return new Request(models.enums.Action.LOGOUT, null);
     }
+
 }

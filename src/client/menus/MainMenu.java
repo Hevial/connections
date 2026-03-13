@@ -11,6 +11,7 @@ import com.google.gson.JsonElement;
 import models.AuthRequest;
 import models.Request;
 import models.enums.Action;
+import models.enums.MenuAction;
 
 public class MainMenu extends BaseMenu {
 
@@ -50,14 +51,14 @@ public class MainMenu extends BaseMenu {
     }
 
     private Request buildRegisterRequest() {
-        setCurrAction("REGISTRAZIONE");
+        setCurrAction(MenuAction.REGISTER.getDisplayName());
         AuthRequest user = requestCredentials("Username: ", "Password: ");
         JsonElement data = gson.toJsonTree(user, AuthRequest.class);
         return new Request(Action.REGISTER, data);
     }
 
     private Request buildLoginRequest() {
-        setCurrAction("LOGIN");
+        setCurrAction(MenuAction.LOGIN.getDisplayName());
         AuthRequest user = requestCredentials("Username: ", "Password: ");
         JsonElement data = gson.toJsonTree(user, AuthRequest.class);
         return new Request(Action.LOGIN, data);

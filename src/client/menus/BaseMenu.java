@@ -11,6 +11,7 @@ import models.AuthRequest;
 import models.Request;
 import models.User;
 import models.enums.Action;
+import models.enums.MenuAction;
 
 /**
  * BaseMenu is an abstract class that provides a foundation for implementing
@@ -43,7 +44,8 @@ public abstract class BaseMenu {
     protected String lastMessage;
     protected String username;
     protected String currAction;
-    protected String data;
+    protected String gameData;
+    protected boolean shouldShowGameData;
 
     protected Gson gson = new Gson();
 
@@ -69,8 +71,16 @@ public abstract class BaseMenu {
         this.currAction = action;
     }
 
-    public void setData(String data) {
-        this.data = data;
+    public void setData(String gameData) {
+        this.gameData = gameData;
+    }
+
+    public void showGameData() {
+        this.shouldShowGameData = true;
+    }
+
+    public void hideGameData() {
+        this.shouldShowGameData = false;
     }
 
     /* Menu Interface Implementation */
@@ -122,7 +132,7 @@ public abstract class BaseMenu {
     }
 
     public Request buildUpdateCredentialsRequest() {
-        setCurrAction("AGGIORNA CREDENZIALI");
+        setCurrAction(MenuAction.UPDATE_CREDENTIALS.getDisplayName());
         AuthRequest oldUser = requestCredentials("Vecchio Username: ", "Vecchia Password: ");
         AuthRequest newUser = requestCredentials("Nuovo Username: ", "Nuova Password: ");
 
@@ -163,18 +173,30 @@ public abstract class BaseMenu {
         System.out.println("╠═════════════════════════════════╝");
     }
 
+    /**
+     * Prints dynamic information to the console based on the current state.
+     * 
+     * This method displays optional information including the last message,
+     * current action, username, and game data. Each piece of information is
+     * only printed if it exists (is not null or, for messages, not blank).
+     * 
+     * The output is formatted with box-drawing characters (╠ and ║) for
+     * visual organization in the console.
+     */
     protected void printDynamicInfo() {
         if (lastMessage != null && !lastMessage.isBlank())
-            System.out.println("╠ Messaggio: " + lastMessage);
+            System.out.println("╠ Messaggio: " + lastMessage + "\n║");
 
         if (currAction != null)
-            System.out.println("╠ Azione: " + currAction);
+            System.out.println("╠ Azione: " + currAction + "\n║");
 
         if (username != null)
-            System.out.println("╠ Utente: " + username);
+            System.out.println("╠ Utente: " + username + "\n║");
 
-        if (data != null)
-            System.out.println("╠ Dati: " + data);
+        if (gameData != null && shouldShowGameData) {
+            System.out.print(gameData);
+            shouldShowGameData = false;
+        }
 
         System.out.println("║");
     }
