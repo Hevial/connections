@@ -1,7 +1,5 @@
 package server;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -71,11 +69,9 @@ public class GameManager implements Runnable {
             // Create state lazily (first access) or regenerate it if this state
             // belongs to a previous round (different gameId).
             if (existingState == null || existingState.getGameId() != snapshot.getGameId()) {
-                ArrayList<String> shuffledWords = new ArrayList<>(snapshot.getGame().getAllWords());
-                Collections.shuffle(shuffledWords);
                 return new PlayerGameState(
                         snapshot.getGameId(),
-                        shuffledWords,
+                        snapshot.getAllWordsShuffled(),
                         snapshot.getRemainingTime());
             }
 
