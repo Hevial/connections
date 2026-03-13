@@ -55,6 +55,10 @@ import models.User;
  * </p>
  *
  */
+
+// TODO: Refactor to separete responsibilities user management and game data
+// management into different classes if needed.
+// (Maybe)
 public class DBManager {
 
     private static DBManager instance;
