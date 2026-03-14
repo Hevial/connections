@@ -5,7 +5,7 @@ public enum Action {
     LOGIN,
     LOGOUT,
     UPDATE_CREDENTIALS,
-    MAKE_PROPOSAL,
+    SUBMIT_PROPOSAL,
     GAME_STATUS,
     GAME_STATS,
     LEADERBOARD,

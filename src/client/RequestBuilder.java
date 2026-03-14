@@ -116,7 +116,7 @@ public class RequestBuilder {
         // menu.setCurrAction(MenuAction.MAKE_PROPOSAL.getDisplayName());
         // String proposal = menu.requestInput("Inserisci la tua proposta: ");
         // JsonElement data = gson.toJsonTree(proposal);
-        return new Request(Action.MAKE_PROPOSAL, null);
+        return new Request(Action.SUBMIT_PROPOSAL, null);
     }
 
 }
