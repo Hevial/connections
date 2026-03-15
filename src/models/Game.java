@@ -29,28 +29,16 @@ public class Game {
     }
 
     /**
-     * Checks if the provided set of words forms a valid group in this game.
+     * Returns the theme for a proposed set of words.
+     * <p>
+     * A proposal is considered valid when it matches exactly one group
+     * (same number of words and same word set).
+     * </p>
      *
-     * @param words the set of words to validate
-     * @return true if the words match exactly one of the groups, false otherwise
+     * @param words words proposed by the player
+     * @return the matching theme if the proposal is valid; {@code null} otherwise
      */
-    public boolean isValidGroup(Set<String> words) {
-        for (Group group : groups) {
-            if (group.getWords().size() == words.size() && words.containsAll(group.getWords())) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    /**
-     * Retrieves the theme associated with the given set of words.
-     *
-     * @param words the set of words whose theme is to be retrieved
-     * @return the theme for the given words, or null if the words do not form a
-     *         valid group
-     */
-    public String getTheme(Set<String> words) {
+    public String getProposalTheme(Set<String> words) {
         for (Group group : groups) {
             if (group.getWords().size() == words.size() && words.containsAll(group.getWords())) {
                 return group.getTheme();

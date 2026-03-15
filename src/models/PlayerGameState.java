@@ -1,33 +1,44 @@
 package models;
 
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
+import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 public class PlayerGameState {
 
     private static final int POINTS_PER_SUCCESS = 6;
     private static final int POINTS_PER_MISTAKE = 4;
+    private static final int LOSING_MISTAKES = 4;
 
     private int gameId;
     private int mistakes;
     private int score;
     private boolean isWinner;
     private boolean isComplete;
-    private Map<Set<String>, String> groupsFound;
-    private List<String> wordsLeft;
+    private boolean isLoser;
+
+    // TODO: refactor to have all groups in game state and mark them as found or
+    // not, instead of having a separate list of found groups and words left
+    // this way we can also keep track of the themes of the groups found, which is
+    // needed for the client display
+    // and knwo witch groups are left to find
+    private List<Group> groupsFound;
+    private transient List<Group> groupsLeft;
+    private List<String> wordsLeft; // initially contains all words, then updated by removing found words
+    private Set<String> allWords;
     private String timeLeft;
 
-    public PlayerGameState(int gameId, List<String> wordsLeft, String timeLeft) {
+    public PlayerGameState(int gameId, List<String> wordsLeft, String timeLeft, List<Group> groupsLeft) {
         this.gameId = gameId;
         this.mistakes = 0;
         this.score = 0;
         this.isWinner = false;
         this.isComplete = false;
-        this.groupsFound = new LinkedHashMap<>();
+        this.groupsFound = new ArrayList<>();
+        this.groupsLeft = new ArrayList<>(groupsLeft);
         this.wordsLeft = new ArrayList<>(wordsLeft);
+        this.allWords = new HashSet<>(wordsLeft);
         this.timeLeft = timeLeft;
     }
 
@@ -43,10 +54,6 @@ public class PlayerGameState {
         return isWinner;
     }
 
-    public void setWinner(boolean isWinner) {
-        this.isWinner = isWinner;
-    }
-
     public boolean isComplete() {
         return isComplete;
     }
@@ -57,11 +64,14 @@ public class PlayerGameState {
 
     /**
      * Increments the mistake counter by one.
-     * This method is used to track the number of mistakes made by the player
-     * during gameplay.
+     * <p>
+     * When the number of mistakes reaches {@code LOSING_MISTAKES}, the player is
+     * marked as loser.
+     * </p>
      */
     public void incrementMistakes() {
         mistakes++;
+        isLoser = mistakes >= LOSING_MISTAKES;
     }
 
     /**
@@ -83,20 +93,58 @@ public class PlayerGameState {
         score -= POINTS_PER_MISTAKE;
     }
 
-    public Map<Set<String>, String> getGroupsFound() {
-        return Map.copyOf(groupsFound);
+    public List<Group> getGroupsFound() {
+        return List.copyOf(groupsFound);
     }
 
-    public void addGroupFound(String theme, Set<String> words) {
-        groupsFound.put(Set.copyOf(words), theme);
+    /**
+     * Marks a proposal as found and updates the live player state.
+     * <p>
+     * The method tries to find an equivalent group inside {@code groupsLeft}
+     * (set-based comparison, word order ignored). If found, that original group is
+     * moved to {@code groupsFound}; otherwise a fallback group is created from the
+     * provided theme and words.
+     * </p>
+     * <p>
+     * After the group update, proposal words are removed from {@code wordsLeft}.
+     * When no words remain, the player is marked as winner and the game as
+     * complete.
+     * </p>
+     *
+     * @param theme theme associated with the found group
+     * @param words words proposed by the player
+     */
+    public void addFoundGroup(String theme, Set<String> words) {
+        Set<String> proposalWords = Set.copyOf(words);
+        Group foundGroup = null;
+
+        for (Group group : groupsLeft) {
+            if (Set.copyOf(group.getWords()).equals(proposalWords)) {
+                foundGroup = group;
+                break;
+            }
+        }
+
+        if (foundGroup != null) {
+            groupsLeft.remove(foundGroup);
+            groupsFound.add(foundGroup);
+        } else {
+            // Fallback in case groupsLeft is out of sync for any reason.
+            groupsFound.add(new Group(theme, new ArrayList<>(proposalWords)));
+            System.err.println(
+                    "Warning: Group not found in groupsLeft for theme '" + theme + "' and words " + proposalWords);
+        }
+
+        wordsLeft.removeAll(words);
+
+        if (wordsLeft.isEmpty()) {
+            isComplete = true;
+            isWinner = true;
+        }
     }
 
     public List<String> getWordsLeft() {
         return List.copyOf(wordsLeft);
-    }
-
-    public void setWordsLeft(List<String> wordsLeft) {
-        this.wordsLeft = new ArrayList<>(wordsLeft);
     }
 
     public String getTimeLeft() {
@@ -111,8 +159,47 @@ public class PlayerGameState {
         return gameId;
     }
 
-    public void setGameId(int gameId) {
-        this.gameId = gameId;
+    /**
+     * Checks whether a proposed group has already been found by the player.
+     * <p>
+     * The comparison is set-based, so word order does not matter.
+     * </p>
+     *
+     * @param words the proposed group words
+     * @return {@code true} if an equivalent group is already present in
+     *         {@code groupsFound}; {@code false} otherwise
+     */
+    public boolean hasFoundGroup(Set<String> words) {
+        Set<String> proposalWords = Set.copyOf(words);
+        for (Group foundGroup : groupsFound) {
+            if (Set.copyOf(foundGroup.getWords()).equals(proposalWords)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Validates that all proposed words belong to the current game dictionary.
+     * <p>
+     * This check does not evaluate whether words form a correct group; it only
+     * verifies membership against the complete set of game words.
+     * </p>
+     *
+     * @param words proposed words to validate
+     * @return {@code true} if all words are part of this game; {@code false}
+     *         otherwise
+     */
+    public boolean areWordsValid(Set<String> words) {
+        return allWords.containsAll(words);
+    }
+
+    public boolean isLoser() {
+        return isLoser;
+    }
+
+    public void setLoser(boolean isLoser) {
+        this.isLoser = isLoser;
     }
 
 }

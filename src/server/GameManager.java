@@ -72,7 +72,8 @@ public class GameManager implements Runnable {
                 return new PlayerGameState(
                         snapshot.getGameId(),
                         snapshot.getAllWordsShuffled(),
-                        snapshot.getRemainingTime());
+                        snapshot.getRemainingTime(),
+                        snapshot.getGame().getGroups());
             }
 
             // Same round: keep progress but refresh remaining time from current snapshot.

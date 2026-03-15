@@ -7,6 +7,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Represents the runtime state of a game session.
@@ -91,6 +92,10 @@ public class GameState {
         return Instant.ofEpochMilli(endingTime)
                 .atZone(ZoneId.systemDefault())
                 .format(CREATED_AT_FORMATTER);
+    }
+
+    public String getProposalTheme(Set<String> words) {
+        return game.getProposalTheme(words);
     }
 
     public void printGameState() {
