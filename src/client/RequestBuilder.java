@@ -1,5 +1,6 @@
 package client;
 
+import java.util.List;
 import java.util.Map;
 
 import com.google.gson.Gson;
@@ -110,13 +111,12 @@ public class RequestBuilder {
         return new Request(Action.PERSONAL_STATS, null);
     }
 
-    // TODO: implement proposal data collection in UI and serialize it in this
-    // method
     public Request buildMakeProposalRequest() {
-        // menu.setCurrAction(MenuAction.MAKE_PROPOSAL.getDisplayName());
-        // String proposal = menu.requestInput("Inserisci la tua proposta: ");
-        // JsonElement data = gson.toJsonTree(proposal);
-        return new Request(Action.SUBMIT_PROPOSAL, null);
+        menu.setCurrAction(MenuAction.MAKE_PROPOSAL.getDisplayName());
+        menu.showGameData();
+        List<String> proposal = menu.getWordsForProposal();
+        JsonElement data = gson.toJsonTree(Map.of("proposalWords", proposal));
+        return new Request(Action.SUBMIT_PROPOSAL, data);
     }
 
 }

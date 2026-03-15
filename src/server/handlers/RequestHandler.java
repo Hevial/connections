@@ -24,6 +24,7 @@ public class RequestHandler {
         actionHandlers.put(Action.REGISTER, new RegisterRequestHandler());
         actionHandlers.put(Action.UPDATE_CREDENTIALS, new UpdateCredentialsRequestHandler());
         actionHandlers.put(Action.LOGOUT, new LogoutRequestHandler());
+        actionHandlers.put(Action.SUBMIT_PROPOSAL, new SubmitProposalRequestHandler(gameManager));
     }
 
     public Response handleRequest(Request request, Session session) {
