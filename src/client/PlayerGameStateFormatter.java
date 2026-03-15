@@ -1,9 +1,8 @@
 package client;
 
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
+import models.Group;
 import models.PlayerGameState;
 
 /**
@@ -40,10 +39,10 @@ public final class PlayerGameStateFormatter {
         if (state.getGroupsFound().isEmpty()) {
             appendCenteredLine(sb, "Nessun gruppo trovato");
         } else {
-            for (Map.Entry<Set<String>, String> entry : state.getGroupsFound().entrySet()) {
-                appendLine(sb, center(trimToWidth(entry.getValue().toUpperCase(), CONTENT_WIDTH), CONTENT_WIDTH));
-                appendWordsGrid(sb, List.copyOf(entry.getKey()));
-                appendBorder(sb, '╟', '─', '╢');
+            for (Group group : state.getGroupsFound()) {
+                appendLine(sb, center(trimToWidth(group.getTheme().toUpperCase(), CONTENT_WIDTH), CONTENT_WIDTH));
+                appendWordsGrid(sb, group.getWords());
+                appendBorder(sb, '║', ' ', '║');
             }
         }
 
@@ -144,4 +143,5 @@ public final class PlayerGameStateFormatter {
         }
         return text.substring(0, width - 3) + "...";
     }
+
 }
