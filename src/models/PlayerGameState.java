@@ -17,12 +17,6 @@ public class PlayerGameState {
     private boolean isWinner;
     private boolean isComplete;
     private boolean isLoser;
-
-    // TODO: refactor to have all groups in game state and mark them as found or
-    // not, instead of having a separate list of found groups and words left
-    // this way we can also keep track of the themes of the groups found, which is
-    // needed for the client display
-    // and knwo witch groups are left to find
     private List<Group> groupsFound;
     private transient List<Group> groupsLeft;
     private List<String> wordsLeft; // initially contains all words, then updated by removing found words
@@ -72,6 +66,7 @@ public class PlayerGameState {
     public void incrementMistakes() {
         mistakes++;
         isLoser = mistakes >= LOSING_MISTAKES;
+        isComplete = isLoser; // Game is complete if the player has lost
     }
 
     /**
