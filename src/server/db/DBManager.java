@@ -302,6 +302,35 @@ public class DBManager {
     }
 
     /**
+     * Opens the games file reader from the beginning of the JSON array.
+     * <p>
+     * If a reader is already open, it is closed before creating the new one.
+     *
+     * @throws Exception if the games file cannot be opened or parsed
+     */
+
+    private void openGamesReader() throws Exception {
+        closeGamesReader();
+        gamesJsonReader = new JsonReader(new FileReader(config.getGamesPath()));
+        gamesJsonReader.beginArray();
+    }
+
+    /**
+     * Closes the current games reader and clears the associated reference.
+     */
+    private void closeGamesReader() {
+        try {
+            if (gamesJsonReader != null) {
+                gamesJsonReader.close();
+            }
+        } catch (Exception e) {
+            // Ignore cleanup errors, the reader is being recreated anyway.
+        } finally {
+            gamesJsonReader = null;
+        }
+    }
+
+    /**
      * Saves the completed game state to the game history file in JSON format.
      * The method appends the serialized game state to the file, ensuring each entry
      * is separated by a newline.
@@ -449,35 +478,6 @@ public class DBManager {
             gson.toJson(currPlayersStats, writer);
         } catch (Exception e) {
             throw new RuntimeException("Failed to update users stats in database", e);
-        }
-    }
-
-    /**
-     * Opens the games file reader from the beginning of the JSON array.
-     * <p>
-     * If a reader is already open, it is closed before creating the new one.
-     *
-     * @throws Exception if the games file cannot be opened or parsed
-     */
-
-    private void openGamesReader() throws Exception {
-        closeGamesReader();
-        gamesJsonReader = new JsonReader(new FileReader(config.getGamesPath()));
-        gamesJsonReader.beginArray();
-    }
-
-    /**
-     * Closes the current games reader and clears the associated reference.
-     */
-    private void closeGamesReader() {
-        try {
-            if (gamesJsonReader != null) {
-                gamesJsonReader.close();
-            }
-        } catch (Exception e) {
-            // Ignore cleanup errors, the reader is being recreated anyway.
-        } finally {
-            gamesJsonReader = null;
         }
     }
 
