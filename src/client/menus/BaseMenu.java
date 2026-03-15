@@ -1,5 +1,6 @@
 package client.menus;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 import java.util.function.Supplier;
@@ -143,6 +144,19 @@ public abstract class BaseMenu {
         System.out.print("╠ " + passwordPrompt);
         String password = scanner.nextLine();
         return new AuthRequest(username, password);
+    }
+
+    /**
+     * Returns proposal words collected from UI.
+     *
+     * <p>
+     * Only menus that support proposal creation should override this method.
+     * </p>
+     *
+     * @return list of words for the proposal
+     */
+    public List<String> getWordsForProposal() {
+        throw new UnsupportedOperationException("Proposal input is not supported in this menu");
     }
 
     /* Template Methods for Menu Display */
