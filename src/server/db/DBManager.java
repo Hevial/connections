@@ -3,15 +3,24 @@ package server.db;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
+import java.io.IOException;
+import java.lang.reflect.Type;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.JsonReader;
 
 import models.Game;
+import models.MistakeHistogram;
+import models.PlayerGameState;
 import models.User;
+import models.UserStats;
+import server.CompletedGame;
 
 /**
  * DBManager is a singleton class responsible for managing user and game data in
@@ -289,6 +298,157 @@ public class DBManager {
         } catch (Exception e) {
             closeGamesReader();
             throw new RuntimeException("Failed to load games from database", e);
+        }
+    }
+
+    /**
+     * Saves the completed game state to the game history file in JSON format.
+     * The method appends the serialized game state to the file, ensuring each entry
+     * is separated by a newline.
+     * This operation is synchronized to prevent concurrent access issues.
+     *
+     * @param gameState The completed game state to be saved.
+     * @throws RuntimeException If an error occurs while writing to the game history
+     *                          file.
+     */
+    synchronized public void saveGameHistory(CompletedGame gameState) {
+        String historyPath = config.getGameHistoryPath();
+
+        Map<String, CompletedGame> gameStateMap = new HashMap<>();
+
+        File historyFile = new File(historyPath);
+        try {
+            if (historyFile.createNewFile()) {
+                System.out.println("File created: " + historyFile.getName());
+            } else {
+                System.out.println("File already exists.");
+            }
+        } catch (IOException e) {
+            System.err.println("Failed to create stats file: " + e.getMessage());
+            e.printStackTrace();
+        }
+
+        try (FileReader reader = new FileReader(historyPath)) {
+            Type type = new TypeToken<Map<String, CompletedGame>>() {
+            }.getType();
+            gameStateMap = gson.fromJson(reader, type);
+            if (gameStateMap == null) {
+                gameStateMap = new HashMap<>();
+            }
+        } catch (Exception e) {
+            System.err.println(
+                    "Failed to read existing game history, starting with an empty history. Error: " + e.getMessage());
+            gameStateMap = new HashMap<>();
+        }
+
+        gameStateMap.put(String.valueOf(gameState.getGameId()), gameState);
+
+        try (FileWriter writer = new FileWriter(historyPath)) { // Append mode
+            Gson gson = new GsonBuilder().setPrettyPrinting().create();
+            gson.toJson(gameStateMap, writer);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to save game history to database", e);
+        }
+    }
+
+    /**
+     * Updates user statistics based on the provided game states.
+     * <p>
+     * Reads the current statistics from the JSON file, updates or creates
+     * statistics for each user
+     * based on their PlayerGameState, and saves the result to the file.
+     * </p>
+     * <ul>
+     * <li>If the user has no statistics, creates a new entry.</li>
+     * <li>Increments completed puzzles.</li>
+     * <li>Records the number of mistakes (or "not finished" if the game was not
+     * completed).</li>
+     * <li>Handles streaks, perfect puzzles, and resets in case of defeat.</li>
+     * </ul>
+     * 
+     * @param playerStatesByUserId map userId → PlayerGameState with the game states
+     *                             to update
+     * @throws RuntimeException if a read/write error occurs on the statistics file
+     */
+    synchronized public void updateUsersStats(Map<String, PlayerGameState> playerStatesByUserId) {
+
+        String statsPath = config.getUsersStatsPath();
+
+        Type type = new TypeToken<Map<String, UserStats>>() {
+        }.getType();
+        Map<String, UserStats> currPlayersStats;
+
+        File statsFile = new File(statsPath);
+        try {
+            if (statsFile.createNewFile()) {
+                System.out.println("File created: " + statsFile.getName());
+            } else {
+                System.out.println("File already exists.");
+            }
+        } catch (IOException e) {
+            System.err.println("Failed to create stats file: " + e.getMessage());
+            e.printStackTrace();
+        }
+
+        try (FileReader reader = new FileReader(statsPath)) {
+
+            Gson gson = new Gson();
+            currPlayersStats = gson.fromJson(reader, type);
+            if (currPlayersStats == null) {
+                currPlayersStats = new HashMap<>();
+            }
+
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to read users stats from database", e);
+        }
+
+        // Update stats with new values
+        for (Map.Entry<String, PlayerGameState> entry : playerStatesByUserId.entrySet()) {
+            String userId = entry.getKey();
+            PlayerGameState newStats = entry.getValue();
+
+            // If the user has no existing stats, create a new entry.
+            if (!currPlayersStats.containsKey(userId)) {
+                int perfectGame = newStats.getMistakes() == 0 && newStats.isWinner() ? 1 : 0;
+                MistakeHistogram mistakeHistogram = new MistakeHistogram();
+                mistakeHistogram.increment(newStats.getMistakes());
+                currPlayersStats.put(userId, new UserStats(1, 1, 1, perfectGame, mistakeHistogram));
+                continue;
+            }
+
+            // Update existing stats by incrementing the relevant fields.
+            UserStats existingStats = currPlayersStats.get(userId);
+            existingStats.incrementPuzzlesCompleted();
+
+            // If the game was not completed, we record it in the "not finished" bucket (5).
+            if (!newStats.isComplete()) {
+                existingStats.recordMistake(5);
+            } else { // Otherwise, we record the actual number of mistakes (0–4).
+                existingStats.recordMistake(newStats.getMistakes());
+            }
+
+            // If the game was won, we increment the current streak and perfect puzzles if
+            // there were no mistakes.
+            if (newStats.isWinner()) {
+                existingStats.incrementCurrentStreak();
+                if (newStats.getMistakes() == 0) {
+                    existingStats.incrementPerfectPuzzles();
+                }
+            }
+
+            if (newStats.isLoser() || !newStats.isComplete()) {
+                existingStats.resetCurrentStreak();
+            }
+
+            // existingStats.calculateWinRate();
+            // existingStats.calculateLossRate();
+        }
+
+        try (FileWriter writer = new FileWriter(statsPath)) {
+            Gson gson = new GsonBuilder().setPrettyPrinting().create();
+            gson.toJson(currPlayersStats, writer);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to update users stats in database", e);
         }
     }
 
