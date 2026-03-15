@@ -82,12 +82,44 @@ public class GameManager implements Runnable {
         });
     }
 
+    private void saveInGameHistory() {
+
+        DBManager dbManager = DBManager.getInstance();
+        CompletedGame completedGame = new CompletedGame(currentGameState.getGameId(), playerStatesByUserId);
+        try {
+            dbManager.saveGameHistory(completedGame);
+        } catch (Exception e) {
+            System.out.println("Failed to save game history: " + e.getMessage());
+        }
+
+    }
+
+    private void updatePlayersStats() {
+        DBManager dbManager = DBManager.getInstance();
+        try {
+            dbManager.updateUsersStats(playerStatesByUserId);
+        } catch (Exception e) {
+            System.out.println("Failed to update users stats: " + e.getMessage());
+        }
+    }
+
     @Override
     public void run() {
 
         DBManager dbManager = DBManager.getInstance();
 
         try {
+
+            // Before starting a new round, save the completed game to history and update
+            // player stats in the database. This ensures that we capture the final state of
+            // the game and player performance before resetting for the next round.
+            if (currentGameState != null) {
+                saveInGameHistory();
+                updatePlayersStats();
+            }
+
+            playerStatesByUserId.clear(); // Clear live player states for the new round
+
             Game currentGame = dbManager.loadNextGame();
             currentGameState = new GameState(currentGame, System.currentTimeMillis(), gameDuration);
 
