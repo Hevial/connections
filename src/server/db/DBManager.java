@@ -52,7 +52,7 @@ import server.CompletedGame;
  *
  * <h2>Thread Safety:</h2>
  * <p>
- * Most public methods are thread-safe, using synchronization or concurrent
+ * Public methods are thread-safe, using synchronization or concurrent
  * collections
  * to ensure data consistency in a multi-threaded environment.
  * </p>
@@ -468,9 +468,6 @@ public class DBManager {
             if (newStats.isLoser() || !newStats.isComplete()) {
                 existingStats.resetCurrentStreak();
             }
-
-            // existingStats.calculateWinRate();
-            // existingStats.calculateLossRate();
         }
 
         try (FileWriter writer = new FileWriter(statsPath)) {
