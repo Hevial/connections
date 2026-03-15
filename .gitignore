@@ -6,3 +6,5 @@ bin/
 *.jar
 lib/
 src/data/Users.json
+src/data/GameHistory.json
+src/data/UserStats.json
