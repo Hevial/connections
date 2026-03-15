@@ -16,6 +16,8 @@ public class DBConfig {
 
     private String gamesPath;
     private String usersPath;
+    private String gameHistoryPath;
+    private String usersStatsPath;
 
     public String getGamesPath() {
         return gamesPath;
@@ -23,6 +25,14 @@ public class DBConfig {
 
     public String getUsersPath() {
         return usersPath;
+    }
+
+    public String getGameHistoryPath() {
+        return gameHistoryPath;
+    }
+
+    public String getUsersStatsPath() {
+        return usersStatsPath;
     }
 
     /**

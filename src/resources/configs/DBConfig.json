@@ -1,4 +1,6 @@
 {
     "gamesPath": "src/data/Games.json",
-    "usersPath": "src/data/Users.json"
+    "usersPath": "src/data/Users.json",
+    "gameHistoryPath": "src/data/GameHistory.json",
+    "usersStatsPath": "src/data/UsersStats.json"
 }
