@@ -20,7 +20,7 @@ public class SubmitProposalResponseHandler implements ResponseActionHandler {
             if (data != null && data.isJsonObject() && data.getAsJsonObject().has("playerGameState")) {
                 PlayerGameState playerGameState = new Gson().fromJson(data.getAsJsonObject().get("playerGameState"),
                         PlayerGameState.class);
-                currentMenu.setData(PlayerGameStateFormatter.format(playerGameState));
+                currentMenu.setGameData(PlayerGameStateFormatter.format(playerGameState));
             }
         } catch (Exception e) {
             currentMenu
