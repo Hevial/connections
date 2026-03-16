@@ -8,6 +8,7 @@ import java.util.function.Supplier;
 import client.RequestBuilder;
 import models.AuthRequest;
 import models.Request;
+import models.User;
 
 /**
  * BaseMenu is an abstract class that provides a foundation for implementing
@@ -42,7 +43,9 @@ public abstract class BaseMenu {
     protected String username;
     protected String currAction;
     protected String gameData;
+    protected String generalData;
     protected boolean shouldShowGameData;
+    protected boolean shouldShowGeneralData;
 
     protected BaseMenu(Scanner scanner) {
         this.scanner = scanner;
@@ -67,8 +70,12 @@ public abstract class BaseMenu {
         this.currAction = action;
     }
 
-    public void setData(String gameData) {
+    public void setGameData(String gameData) {
         this.gameData = gameData;
+    }
+
+    public void setGeneralData(String generalData) {
+        this.generalData = generalData;
     }
 
     public void showGameData() {
@@ -77,6 +84,14 @@ public abstract class BaseMenu {
 
     public void hideGameData() {
         this.shouldShowGameData = false;
+    }
+
+    public void showGeneralData() {
+        this.shouldShowGeneralData = true;
+    }
+
+    public void hideGeneralData() {
+        this.shouldShowGeneralData = false;
     }
 
     /* Menu Interface Implementation */
@@ -106,6 +121,7 @@ public abstract class BaseMenu {
     }
 
     public int getChoice() {
+        setCurrAction(null);
         String prompt = "╠ Seleziona un'opzione: ";
         System.out.print(prompt);
 
@@ -123,8 +139,15 @@ public abstract class BaseMenu {
             } catch (NumberFormatException ignored) {
             }
             resetScreen();
+            setCurrAction(null);
             System.out.print("╠ Scelta non valida. Riprova: ");
         }
+    }
+
+    public String requestInput(String prompt) {
+        resetScreen();
+        System.out.print("╠ " + prompt);
+        return scanner.nextLine().trim();
     }
 
     /**
@@ -157,6 +180,10 @@ public abstract class BaseMenu {
      */
     public List<String> getWordsForProposal() {
         throw new UnsupportedOperationException("Proposal input is not supported in this menu");
+    }
+
+    public int getGameId() {
+        throw new UnsupportedOperationException("Game ID input is not supported in this menu");
     }
 
     /* Template Methods for Menu Display */
@@ -207,8 +234,17 @@ public abstract class BaseMenu {
             System.out.println("╠ Utente: " + username + "\n║");
 
         if (gameData != null && shouldShowGameData) {
+            if (shouldShowGeneralData) {
+                shouldShowGeneralData = false;
+            }
+
             System.out.print(gameData);
             shouldShowGameData = false;
+        }
+
+        if (generalData != null && shouldShowGeneralData) {
+            System.out.print(generalData);
+            shouldShowGeneralData = false;
         }
 
         System.out.println("║");

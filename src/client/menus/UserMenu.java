@@ -16,12 +16,13 @@ public class UserMenu extends BaseMenu {
         super(scanner);
         this.requestBuilders = Map.of(
                 1, requestBuilder::buildMakeProposalRequest,
-                2, requestBuilder::buildGameStatusRequest,
-                3, requestBuilder::buildGameStatsRequest,
-                4, requestBuilder::buildPersonalStatsRequest,
-                5, requestBuilder::buildLeaderboardRequest,
-                6, requestBuilder::buildUpdateCredentialsRequest,
-                7, requestBuilder::buildLogoutRequest,
+                2, requestBuilder::buildCurrentGameStatusRequest,
+                3, requestBuilder::buildGameStatusByIdRequest,
+                4, requestBuilder::buildGameStatsRequest,
+                5, requestBuilder::buildPersonalStatsRequest,
+                6, requestBuilder::buildLeaderboardRequest,
+                7, requestBuilder::buildUpdateCredentialsRequest,
+                8, requestBuilder::buildLogoutRequest,
                 0, () -> {
                     clearScreen();
                     System.exit(0);
@@ -44,12 +45,13 @@ public class UserMenu extends BaseMenu {
     protected Map<Integer, String> getMenuOptions() {
         Map<Integer, String> options = new LinkedHashMap<>();
         options.put(1, "Fai Proposta");
-        options.put(2, "Stato Partita");
-        options.put(3, "Statistiche Partita");
-        options.put(4, "Statistiche Personali");
-        options.put(5, "Classifica");
-        options.put(6, "Aggiorna Credenziali");
-        options.put(7, "Logout");
+        options.put(2, "Stato Partita Attuale");
+        options.put(3, "Stato Partita per Id");
+        options.put(4, "Statistiche Partita");
+        options.put(5, "Statistiche Personali");
+        options.put(6, "Classifica");
+        options.put(7, "Aggiorna Credenziali");
+        options.put(8, "Logout");
         options.put(0, "Esci");
         return options;
     }
@@ -60,7 +62,7 @@ public class UserMenu extends BaseMenu {
         while (true) {
             showGameData();
             System.out.print(
-                    "╠ Inserisci le parole per la proposta (esattamente 4 parole separate da virgola):");
+                    "╠ Inserisci le parole per la proposta (esattamente 4 parole separate da virgola): ");
 
             String wordsString = scanner.nextLine().trim();
             String[] rawWords = wordsString.split(",");
@@ -97,6 +99,28 @@ public class UserMenu extends BaseMenu {
 
             return words;
         }
+    }
+
+    @Override
+    public int getGameId() {
+        int gameId = -1;
+        String input = requestInput("Inserisci l'ID della partita da visualizzare: ");
+        input = input.trim();
+        while (true) {
+            try {
+                gameId = Integer.parseInt(input);
+                if (gameId >= 0) {
+                    break; // valid id entered
+                } else {
+                    // negative id; prompt again
+                    input = requestInput("ID non valido. Inserisci un id numerico positivo: ");
+                }
+            } catch (NumberFormatException e) {
+                // non-numeric input; prompt again
+                input = requestInput("Input non valido. Inserisci un id numerico positivo: ");
+            }
+        }
+        return gameId;
     }
 
 }
