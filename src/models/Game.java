@@ -15,15 +15,35 @@ public class Game {
     private int gameId; // Unique identifier for the game
     private List<Group> groups; // List of word groups with their themes
 
+    /**
+     * Constructs a new Game instance with the specified id and groups.
+     *
+     * @param gameId unique identifier for the game
+     * @param groups list of groups (themes and words) that compose the game
+     */
     public Game(int gameId, List<Group> groups) {
         this.gameId = gameId;
         this.groups = groups;
     }
 
+    /**
+     * Returns the unique identifier of the game.
+     *
+     * @return the game id
+     */
     public int getGameId() {
         return gameId;
     }
 
+    /**
+     * Returns the list of groups for this game.
+     * <p>
+     * Each {@link Group} contains a theme and the words that belong to that
+     * theme. The caller should not modify the returned list directly.
+     * </p>
+     *
+     * @return the groups composing this game
+     */
     public List<Group> getGroups() {
         return groups;
     }

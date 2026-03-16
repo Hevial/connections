@@ -18,7 +18,7 @@ public class PlayerGameState {
     private boolean isComplete;
     private boolean isLoser;
     private List<Group> groupsFound;
-    private transient List<Group> groupsLeft;
+    private List<Group> groupsLeft;
     private List<String> wordsLeft; // initially contains all words, then updated by removing found words
     private Set<String> allWords;
     private String timeLeft;
@@ -36,6 +36,14 @@ public class PlayerGameState {
         this.timeLeft = timeLeft;
     }
 
+    /**
+     * Returns the number of mistakes made by the player in the current game.
+     * <p>
+     * This value increases each time the player makes an incorrect proposal.
+     * </p>
+     *
+     * @return the number of mistakes
+     */
     public int getMistakes() {
         return mistakes;
     }
@@ -88,6 +96,16 @@ public class PlayerGameState {
         score -= POINTS_PER_MISTAKE;
     }
 
+    /**
+     * Returns the list of groups correctly found by the player during the current
+     * game.
+     * <p>
+     * Each group represents a correct proposal made by the player.
+     * The returned list is immutable.
+     * </p>
+     *
+     * @return an immutable list of groups found by the player
+     */
     public List<Group> getGroupsFound() {
         return List.copyOf(groupsFound);
     }
