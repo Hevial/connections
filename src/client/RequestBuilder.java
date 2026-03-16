@@ -146,7 +146,9 @@ public class RequestBuilder {
     }
 
     public Request buildGameStatsRequest() {
-        return new Request(Action.GAME_STATS, null);
+        int gameId = menu.getGameId();
+        JsonElement reqData = gson.toJsonTree(Map.of("gameId", gameId));
+        return new Request(Action.GAME_STATS, reqData);
     }
 
     public Request buildLeaderboardRequest() {
