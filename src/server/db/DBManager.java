@@ -480,7 +480,7 @@ public class DBManager {
             existingStats.incrementPuzzlesCompleted();
 
             // If the game was not completed, we record it in the "not finished" bucket (5).
-            if (!newStats.isComplete()) {
+            if (!newStats.isCompleted()) {
                 existingStats.recordMistake(5);
             } else { // Otherwise, we record the actual number of mistakes (0–4).
                 existingStats.recordMistake(newStats.getMistakes());
@@ -495,7 +495,7 @@ public class DBManager {
                 }
             }
 
-            if (newStats.isLoser() || !newStats.isComplete()) {
+            if (newStats.isLoser() || !newStats.isCompleted()) {
                 existingStats.resetCurrentStreak();
             }
         }

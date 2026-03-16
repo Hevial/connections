@@ -72,7 +72,7 @@ public class CompletedGame {
                 winners++;
             }
 
-            if (state.isComplete()) {
+            if (state.isCompleted()) {
                 completers++;
             }
 

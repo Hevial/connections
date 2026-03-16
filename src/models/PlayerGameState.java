@@ -15,7 +15,7 @@ public class PlayerGameState {
     private int mistakes;
     private int score;
     private boolean isWinner;
-    private boolean isComplete;
+    private boolean isCompleted;
     private boolean isLoser;
     private List<Group> groupsFound;
     private List<Group> groupsLeft;
@@ -28,7 +28,7 @@ public class PlayerGameState {
         this.mistakes = 0;
         this.score = 0;
         this.isWinner = false;
-        this.isComplete = false;
+        this.isCompleted = false;
         this.groupsFound = new ArrayList<>();
         this.groupsLeft = new ArrayList<>(groupsLeft);
         this.wordsLeft = new ArrayList<>(wordsLeft);
@@ -56,12 +56,12 @@ public class PlayerGameState {
         return isWinner;
     }
 
-    public boolean isComplete() {
-        return isComplete;
+    public boolean isCompleted() {
+        return isCompleted;
     }
 
-    public void setComplete(boolean isComplete) {
-        this.isComplete = isComplete;
+    public void setComplete(boolean isCompleted) {
+        this.isCompleted = isCompleted;
     }
 
     /**
@@ -74,7 +74,7 @@ public class PlayerGameState {
     public void incrementMistakes() {
         mistakes++;
         isLoser = mistakes >= LOSING_MISTAKES;
-        isComplete = isLoser; // Game is complete if the player has lost
+        isCompleted = isLoser; // Game is complete if the player has lost
     }
 
     /**
@@ -151,7 +151,7 @@ public class PlayerGameState {
         wordsLeft.removeAll(words);
 
         if (wordsLeft.isEmpty()) {
-            isComplete = true;
+            isCompleted = true;
             isWinner = true;
         }
     }
