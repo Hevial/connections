@@ -15,12 +15,12 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.JsonReader;
 
+import models.CompletedGame;
 import models.Game;
 import models.MistakeHistogram;
 import models.PlayerGameState;
 import models.User;
 import models.UserStats;
-import server.CompletedGame;
 
 /**
  * DBManager is a singleton class responsible for managing user and game data in
@@ -377,6 +377,36 @@ public class DBManager {
             gson.toJson(gameStateMap, writer);
         } catch (Exception e) {
             throw new RuntimeException("Failed to save game history to database", e);
+        }
+    }
+
+    /**
+     * Reads the persisted game history file and returns the completed game with
+     * the specified id.
+     * <p>
+     * The method deserializes a map of gameId &rarr; {@link CompletedGame} from
+     * the configured history JSON file and looks up the requested id.
+     * </p>
+     *
+     * @param gameId the id of the completed game to retrieve
+     * @return the {@link CompletedGame} instance if present; {@code null} if the
+     *         history file is empty or the id is not found
+     * @throws RuntimeException if an error occurs while reading or parsing the
+     *                          history file
+     */
+    synchronized public CompletedGame getCompletedGameById(int gameId) {
+        String historyPath = config.getGameHistoryPath();
+
+        try (FileReader reader = new FileReader(historyPath)) {
+            Type type = new TypeToken<Map<String, CompletedGame>>() {
+            }.getType();
+            Map<String, CompletedGame> gameStateMap = gson.fromJson(reader, type);
+            if (gameStateMap == null) {
+                return null;
+            }
+            return gameStateMap.get(String.valueOf(gameId));
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to read game history from database", e);
         }
     }
 

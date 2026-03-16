@@ -3,6 +3,7 @@ package server;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import models.CompletedGame;
 import models.Game;
 import models.GameState;
 import models.PlayerGameState;
@@ -85,7 +86,8 @@ public class GameManager implements Runnable {
     private void saveInGameHistory() {
 
         DBManager dbManager = DBManager.getInstance();
-        CompletedGame completedGame = new CompletedGame(currentGameState.getGameId(), playerStatesByUserId);
+        CompletedGame completedGame = new CompletedGame(currentGameState.getGameId(), playerStatesByUserId,
+                currentGameState.getGame().getGroups());
         try {
             dbManager.saveGameHistory(completedGame);
         } catch (Exception e) {
