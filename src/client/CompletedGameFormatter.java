@@ -68,7 +68,7 @@ public final class CompletedGameFormatter {
 
         PlayerGameStats stats = game.getPlayerStats();
         if (stats == null) {
-            appendCenteredLine(sb, "Nessuna statistica disponibile (perché non hai partecipato a questa partita)");
+            appendCenteredLine(sb, "Nessuna statistica disponibile (non partecipante)");
         } else {
             appendLine(sb, "Proposte corrette: " + stats.getCorrectProposals() + "  Errori: " + stats.getMistakes());
             appendLine(sb, "Punteggio: " + stats.getScore() + "  Esito: " + stats.getResult());
@@ -88,6 +88,26 @@ public final class CompletedGameFormatter {
         }
 
         appendBorder(sb, '╠', '═', '╝');
+        return sb.toString();
+    }
+
+    /*
+     * Se la partita è conclusa serve a ricevere il numero di
+     * giocatori che hanno partecipato alla partita, il numero di giocatori che
+     * hanno
+     * concluso la partita, il numero di giocatori che hanno concluso la partita con
+     * una vittoria ed il punteggio medio dei giocatori che hanno partecipato alla
+     * partita.
+     */
+    public static String formatSummary(CompletedGame game) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("╠ Statistiche Partita").append("\n");
+        sb.append("║ ").append("-".repeat(70)).append("\n");
+        sb.append("║  Partita #" + game.getGameId()).append("\n");
+        sb.append("║  Giocatori: " + game.getNumberOfPlayers()).append("\n");
+        sb.append("║  Vincitori: " + game.getNumberOfWinners()).append("\n");
+        sb.append("║  Completate: " + game.getNumberOfCompleters()).append("\n");
+        sb.append("║  Punteggio medio: " + String.format("%.2f", game.getAverageScore())).append("\n");
         return sb.toString();
     }
 
