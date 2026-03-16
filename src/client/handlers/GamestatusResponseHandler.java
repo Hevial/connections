@@ -2,6 +2,7 @@ package client.handlers;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 
 import client.CompletedGameFormatter;
 import client.PlayerGameStateFormatter;
@@ -23,15 +24,16 @@ public class GamestatusResponseHandler implements ResponseActionHandler {
 
         Gson gson = new Gson();
 
-        if (data.getAsJsonObject().has("playerGameState")) {
-            PlayerGameState gameState = gson.fromJson(data.getAsJsonObject().get("playerGameState"),
+        JsonObject dataObj = data.getAsJsonObject();
+        if (dataObj.has("playerGameState")) {
+            PlayerGameState gameState = gson.fromJson(dataObj.get("playerGameState"),
                     PlayerGameState.class);
             currentMenu.setGameData(PlayerGameStateFormatter.format(gameState));
             currentMenu.showGameData();
         }
 
-        if (data.getAsJsonObject().has("playerCompletedGame")) {
-            PlayerCompletedGame gameState = gson.fromJson(data.getAsJsonObject().get("playerCompletedGame"),
+        if (dataObj.has("playerCompletedGame")) {
+            PlayerCompletedGame gameState = gson.fromJson(dataObj.get("playerCompletedGame"),
                     PlayerCompletedGame.class);
             currentMenu.setGeneralData(CompletedGameFormatter.formatForUser(gameState));
             currentMenu.showGeneralData();
