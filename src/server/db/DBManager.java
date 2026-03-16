@@ -508,4 +508,41 @@ public class DBManager {
         }
     }
 
+    /**
+     * Retrieves statistics for the specified user from the statistics file.
+     *
+     * <p>
+     * The method opens the JSON file located at {@code config.getUsersStatsPath()},
+     * deserializes it into a {@code Map<String, UserStats>} and returns the
+     * {@link UserStats} associated with {@code userId} if present.
+     * </p>
+     *
+     * <p>
+     * This method is {@code synchronized} because it performs I/O on a shared
+     * statistics file and must be executed in a thread-safe manner relative to
+     * other read/write operations.
+     * </p>
+     *
+     * @param userId the identifier of the user whose statistics are requested
+     * @return the {@link UserStats} instance for {@code userId}, or {@code null}
+     *         if the file is empty or the user is not found
+     * @throws RuntimeException if an error occurs while reading or parsing the
+     *                          statistics file
+     */
+    synchronized public UserStats getUserStats(String userId) {
+        String statsPath = config.getUsersStatsPath();
+
+        try (FileReader reader = new FileReader(statsPath)) {
+            Type type = new TypeToken<Map<String, UserStats>>() {
+            }.getType();
+            Map<String, UserStats> gameStateMap = gson.fromJson(reader, type);
+            if (gameStateMap == null) {
+                return null;
+            }
+            return gameStateMap.get(userId);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to read user stats from database", e);
+        }
+    }
+
 }
