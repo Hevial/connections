@@ -3,8 +3,10 @@ package client.handlers;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 
+import client.CompletedGameFormatter;
 import client.PlayerGameStateFormatter;
 import client.menus.BaseMenu;
+import models.PlayerCompletedGame;
 import models.PlayerGameState;
 import models.enums.StatusCodes;
 
@@ -20,9 +22,20 @@ public class GamestatusResponseHandler implements ResponseActionHandler {
         }
 
         Gson gson = new Gson();
-        PlayerGameState gameState = gson.fromJson(data.getAsJsonObject().get("playerGameState"), PlayerGameState.class);
-        currentMenu.setData(PlayerGameStateFormatter.format(gameState));
-        currentMenu.showGameData();
+
+        if (data.getAsJsonObject().has("playerGameState")) {
+            PlayerGameState gameState = gson.fromJson(data.getAsJsonObject().get("playerGameState"),
+                    PlayerGameState.class);
+            currentMenu.setGameData(PlayerGameStateFormatter.format(gameState));
+            currentMenu.showGameData();
+        }
+
+        if (data.getAsJsonObject().has("playerCompletedGame")) {
+            PlayerCompletedGame gameState = gson.fromJson(data.getAsJsonObject().get("playerCompletedGame"),
+                    PlayerCompletedGame.class);
+            currentMenu.setGeneralData(CompletedGameFormatter.formatForUser(gameState));
+            currentMenu.showGeneralData();
+        }
 
         return currentMenu; // Stay on the same menu after displaying info
     }
