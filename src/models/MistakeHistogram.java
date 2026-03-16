@@ -26,7 +26,7 @@ public class MistakeHistogram {
     private final int[] histogram;
 
     private static final int ISTROGRAM_SIZE = 6; // 0–5 buckets (5 means not finished)
-    private static final int MAX_BAR_LENGTH = 40; // Maximum width of the histogram bar
+    private static final int MAX_BAR_LENGTH = 32; // Maximum width of the histogram bar
 
     public MistakeHistogram() {
         this.histogram = new int[ISTROGRAM_SIZE];
@@ -144,8 +144,8 @@ public class MistakeHistogram {
      */
     public String toFormattedString() {
         StringBuilder sb = new StringBuilder();
-        sb.append("╠  Mistakes histogram\n");
-        sb.append("║ ").append("-".repeat(70)).append("\n");
+        sb.append("╠ Mistakes histogram ").append(" ".repeat(50)).append("║\n");
+        sb.append("║ ").append("-".repeat(68)).append(" ║\n");
 
         int total = 0;
         for (int count : histogram) {
@@ -153,18 +153,22 @@ public class MistakeHistogram {
         }
 
         if (total == 0) {
-            sb.append("║ No data available.\n");
+            sb.append("║ No data available.").append(50).append("║\n");
+            ;
             return sb.toString();
         }
 
         int buckets = histogram.length;
         for (int i = 0; i < buckets; i++) {
-            String label = (i < buckets - 1) ? "║ " + i + " mistakes" : "║  not finished";
+            String label = (i < buckets - 1) ? i + " mistakes" : "not finished";
             double percent = (histogram[i] * 100.0) / total;
             int barLength = (int) Math.round((percent / 100.0) * MAX_BAR_LENGTH);
             String bar = "█".repeat(barLength);
             sb.append(
-                    String.format("║ %-20s | %-*s | %5.1f%% (%d)\n", label, MAX_BAR_LENGTH, bar, percent,
+                    String.format("║ %-14s | %-" + MAX_BAR_LENGTH + "s | %6.1f%% | %6d ║\n",
+                            label,
+                            bar,
+                            percent,
                             histogram[i]));
         }
         return sb.toString();
