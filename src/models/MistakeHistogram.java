@@ -142,7 +142,7 @@ public class MistakeHistogram {
      *
      * @return a formatted string representing the mistake histogram
      */
-    public String toString() {
+    public String toFormattedString() {
         StringBuilder sb = new StringBuilder();
         sb.append("Mistakes histogram\n");
         sb.append("-".repeat(70)).append("\n");
