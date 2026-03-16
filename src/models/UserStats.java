@@ -139,17 +139,44 @@ public class UserStats {
         return total > 0 ? (double) puzzlesLost / total : 0.0;
     }
 
+    /**
+     * Builds a CLI-friendly multi-line summary of the user's statistics.
+     *
+     * <p>
+     * The resulting string contains a header and a separator line followed by
+     * lines showing: total puzzles completed, win rate (as a percentage), loss
+     * rate (as a percentage), current streak, maximum streak, and number of
+     * perfect puzzles. The method then appends the formatted mistake histogram
+     * produced by {@code mistakeHistogram.toFormattedString()}.
+     * </p>
+     *
+     * <p>
+     * The string is intended for terminal display and includes box-drawing
+     * characters used throughout the CLI UI. The method never returns
+     * {@code null} (it always returns a non-empty string).
+     * </p>
+     *
+     * @return a multi-line {@link String} containing the formatted user
+     *         statistics for CLI display
+     */
     public String toFormattedString() {
         StringBuilder sb = new StringBuilder();
-        sb.append("╠  User stats\n");
-        sb.append("║ ").append("-".repeat(70)).append("\n");
-        sb.append(String.format("║ Puzzles completed: %d\n", puzzlesCompleted));
-        sb.append(String.format("║ Win rate: %.2f%%\n", winRate * 100));
-        sb.append(String.format("║ Loss rate: %.2f%%\n", lossRate * 100));
-        sb.append(String.format("║ Current streak: %d\n", currentStreak));
-        sb.append(String.format("║ Max streak: %d\n", maxStreak));
-        sb.append(String.format("║ Perfect puzzles: %d\n", perfectPuzzles));
+
+        sb.append("╠══════════════════════════════════════════════════════════════════════╗\n");
+        sb.append("║                              USER STATS                              ║\n");
+        sb.append("╠══════════════════════════════════════════════════════════════════════╣\n");
+
+        sb.append(String.format("║ %-30s %37d ║\n", "Puzzles completed:", puzzlesCompleted));
+        sb.append(String.format("║ %-30s %36.2f%% ║\n", "Win rate:", winRate * 100));
+        sb.append(String.format("║ %-30s %36.2f%% ║\n", "Loss rate:", lossRate * 100));
+        sb.append(String.format("║ %-30s %37d ║\n", "Current streak:", currentStreak));
+        sb.append(String.format("║ %-30s %37d ║\n", "Max streak:", maxStreak));
+        sb.append(String.format("║ %-30s %37d ║\n", "Perfect puzzles:", perfectPuzzles));
+
+        sb.append("╠══════════════════════════════════════════════════════════════════════╣\n");
         sb.append(mistakeHistogram.toFormattedString());
+        sb.append("╚══════════════════════════════════════════════════════════════════════╝\n");
+
         return sb.toString();
     }
 
