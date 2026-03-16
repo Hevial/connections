@@ -139,4 +139,18 @@ public class UserStats {
         return total > 0 ? (double) puzzlesLost / total : 0.0;
     }
 
+    public String toFormattedString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("╠  User stats\n");
+        sb.append("║ ").append("-".repeat(70)).append("\n");
+        sb.append(String.format("║ Puzzles completed: %d\n", puzzlesCompleted));
+        sb.append(String.format("║ Win rate: %.2f%%\n", winRate * 100));
+        sb.append(String.format("║ Loss rate: %.2f%%\n", lossRate * 100));
+        sb.append(String.format("║ Current streak: %d\n", currentStreak));
+        sb.append(String.format("║ Max streak: %d\n", maxStreak));
+        sb.append(String.format("║ Perfect puzzles: %d\n", perfectPuzzles));
+        sb.append(mistakeHistogram.toFormattedString());
+        return sb.toString();
+    }
+
 }
