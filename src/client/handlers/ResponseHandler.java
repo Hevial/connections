@@ -23,6 +23,7 @@ public class ResponseHandler {
         this.actionHandlers.put(Action.LOGOUT, new LogoutResponseHandler(scanner));
         this.actionHandlers.put(Action.GAME_STATUS, new GamestatusResponseHandler());
         this.actionHandlers.put(Action.SUBMIT_PROPOSAL, new SubmitProposalResponseHandler());
+        this.actionHandlers.put(Action.GAME_STATS, new GameStatsResponseHandler());
     }
 
     public BaseMenu handleResponse(Response response, BaseMenu currentMenu) {
