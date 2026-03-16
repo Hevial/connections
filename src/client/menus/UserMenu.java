@@ -104,20 +104,20 @@ public class UserMenu extends BaseMenu {
     @Override
     public int getGameId() {
         int gameId = -1;
-        String input = requestInput("Inserisci l'ID della partita da visualizzare: ");
+        String input = requestInput("Inserisci l'ID della partita da visualizzare (-1 partita attuale): ");
         input = input.trim();
         while (true) {
             try {
                 gameId = Integer.parseInt(input);
-                if (gameId >= 0) {
+                if (gameId >= -1) {
                     break; // valid id entered
                 } else {
                     // negative id; prompt again
-                    input = requestInput("ID non valido. Inserisci un id numerico positivo: ");
+                    input = requestInput("ID non valido. Inserisci un id numerico positivo (o -1 partita attuale): ");
                 }
             } catch (NumberFormatException e) {
                 // non-numeric input; prompt again
-                input = requestInput("Input non valido. Inserisci un id numerico positivo: ");
+                input = requestInput("Input non valido. Inserisci un id numerico positivo (o -1 partita attuale): ");
             }
         }
         return gameId;
