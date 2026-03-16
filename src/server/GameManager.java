@@ -43,6 +43,69 @@ public class GameManager implements Runnable {
     }
 
     /**
+     * Counts how many players are currently in progress in the live per-user
+     * states.
+     *
+     * Iterates over {@code playerStatesByUserId} and increments the counter for
+     * each {@link PlayerGameState} that is not completed (i.e.
+     * {@code !state.isCompleted()}).
+     * The result is a best-effort snapshot: the underlying
+     * {@code ConcurrentHashMap}
+     * may be concurrently modified by other threads.
+     *
+     * @return the number of players still playing in the active round
+     */
+    public int getPlayersInProgress() {
+        int count = 0;
+        for (PlayerGameState state : playerStatesByUserId.values()) {
+            if (!state.isCompleted()) {
+                count++;
+            }
+        }
+        return count;
+    }
+
+    /**
+     * Counts how many players have completed the current round.
+     *
+     * Iterates over {@code playerStatesByUserId} and counts entries where
+     * {@link PlayerGameState#isCompleted()} returns {@code true}.
+     * The returned value is a snapshot and may change if states are updated
+     * concurrently by other threads.
+     *
+     * @return the number of players who have completed the active round
+     */
+    public int getPlayersCompleted() {
+        int count = 0;
+        for (PlayerGameState state : playerStatesByUserId.values()) {
+            if (state.isCompleted()) {
+                count++;
+            }
+        }
+        return count;
+    }
+
+    /**
+     * Counts how many players are marked as winners in the current round.
+     *
+     * Iterates over {@code playerStatesByUserId} and increments the counter for
+     * each {@link PlayerGameState} where {@code state.isWinner()} is {@code true}.
+     * As with other counters, the result is a concurrent snapshot and may vary
+     * if player states are modified concurrently.
+     *
+     * @return the number of players who won the active round
+     */
+    public int getPlayersWon() {
+        int count = 0;
+        for (PlayerGameState state : playerStatesByUserId.values()) {
+            if (state.isWinner()) {
+                count++;
+            }
+        }
+        return count;
+    }
+
+    /**
      * Returns the live player state for the given user, creating it if missing.
      * <p>
      * Player state is initialized lazily from the current game snapshot. If the
