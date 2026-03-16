@@ -94,9 +94,55 @@ public class RequestBuilder {
         return new Request(Action.UPDATE_CREDENTIALS, data);
     }
 
-    public Request buildGameStatusRequest() {
+    /**
+     * Builds a GAME_STATUS request.
+     * <p>
+     * If {@code currentGame} is {@code true} the request asks the server for the
+     * status of the current game (the payload will carry {@code gameId: -1}).
+     * Otherwise the method prompts the user (via the configured {@code menu}) to
+     * enter a non-negative numeric game id; the prompt repeats until a valid id
+     * is provided. The method sets the current menu action label before
+     * collecting input.
+     * </p>
+     *
+     * @param currentGame when {@code true} request the current game, when
+     *                    {@code false} prompt for a specific game id
+     * @return a {@link Request} with action {@link models.enums.Action#GAME_STATUS}
+     *         and a JSON payload containing the selected {@code gameId}
+     */
+    public Request buildGameStatusRequest(boolean currentGame) {
         menu.setCurrAction(MenuAction.REQUEST_GAME_STATUS.getDisplayName());
-        return new Request(Action.GAME_STATUS, null);
+        int gameId = -1;
+        if (!currentGame) {
+            gameId = menu.getGameId();
+        }
+        JsonElement data = gson.toJsonTree(Map.of("gameId", gameId));
+        return new Request(Action.GAME_STATUS, data);
+    }
+
+    /**
+     * Builds a request asking for the status of the current game on the client.
+     * <p>
+     * Delegates to {@link #buildGameStatusRequest(boolean)} with {@code true}.
+     * </p>
+     *
+     * @return request configured for Action.GAME_STATUS for the current game
+     */
+    public Request buildCurrentGameStatusRequest() {
+        return buildGameStatusRequest(true);
+    }
+
+    /**
+     * Builds a request asking for the status of a specific game by id.
+     * <p>
+     * Delegates to {@link #buildGameStatusRequest(boolean)} with {@code false}.
+     * The builder will prompt the user for the game id.
+     * </p>
+     *
+     * @return request configured for Action.GAME_STATUS for a specific game id
+     */
+    public Request buildGameStatusByIdRequest() {
+        return buildGameStatusRequest(false);
     }
 
     public Request buildGameStatsRequest() {
