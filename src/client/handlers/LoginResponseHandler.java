@@ -36,7 +36,7 @@ public class LoginResponseHandler implements ResponseActionHandler {
         PlayerGameState gameState = gson.fromJson(data.getAsJsonObject().get("playerGameState"), PlayerGameState.class);
         String username = data.getAsJsonObject().get("username").getAsString();
         BaseMenu userMenu = new UserMenu(scanner);
-        userMenu.setData(PlayerGameStateFormatter.format(gameState));
+        userMenu.setGameData(PlayerGameStateFormatter.format(gameState));
         userMenu.showGameData();
         userMenu.setUsername(username);
         userMenu.setLastMessage(msg);
