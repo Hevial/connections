@@ -43,15 +43,29 @@ import java.util.Map;
  */
 public class CompletedGame {
 
-    private final int gameId;
-    private final int numberOfPlayers;
-    private final int numberOfWinners;
-    private final int numberOfCompleters;
-    private final double averageScore;
-    private final List<Group> groups;
+    private int gameId;
+    private int numberOfPlayers;
+    private int numberOfWinners;
+    private int numberOfCompleters;
+    private double averageScore;
+    private List<Group> groups;
 
     // userId -> PlayerGameStats
-    private final Map<String, PlayerGameStats> playerStatsByUserId;
+    private Map<String, PlayerGameStats> playerStatsByUserId;
+
+    /**
+     * No-arg constructor required by Gson for deserialization.
+     * Initializes collections to empty defaults.
+     */
+    public CompletedGame() {
+        this.gameId = 0;
+        this.numberOfPlayers = 0;
+        this.numberOfWinners = 0;
+        this.numberOfCompleters = 0;
+        this.averageScore = 0.0;
+        this.groups = List.of();
+        this.playerStatsByUserId = Map.of();
+    }
 
     public CompletedGame(int gameId, Map<String, PlayerGameState> playerStatesByUserId, List<Group> groups) {
         this.groups = groups;
