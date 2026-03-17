@@ -547,4 +547,20 @@ public class DBManager {
         }
     }
 
+    synchronized public Map<String, UserStats> getAllUsersStats() {
+        String statsPath = config.getUsersStatsPath();
+
+        try (FileReader reader = new FileReader(statsPath)) {
+            Type type = new TypeToken<Map<String, UserStats>>() {
+            }.getType();
+            Map<String, UserStats> gameStateMap = gson.fromJson(reader, type);
+            if (gameStateMap == null) {
+                return Map.of();
+            }
+            return gameStateMap;
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to read user stats from database", e);
+        }
+    }
+
 }
