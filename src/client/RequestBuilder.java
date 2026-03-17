@@ -8,6 +8,7 @@ import com.google.gson.JsonElement;
 
 import client.menus.BaseMenu;
 import models.AuthRequest;
+import models.LeaderboardReq;
 import models.Request;
 import models.enums.Action;
 import models.enums.MenuAction;
@@ -152,7 +153,9 @@ public class RequestBuilder {
     }
 
     public Request buildLeaderboardRequest() {
-        return new Request(Action.LEADERBOARD, null);
+        LeaderboardReq lbReq = menu.getLeaderboardRequest();
+        JsonElement reqData = gson.toJsonTree(lbReq);
+        return new Request(Action.LEADERBOARD, reqData);
     }
 
     public Request buildPersonalStatsRequest() {
