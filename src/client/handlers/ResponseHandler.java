@@ -25,6 +25,7 @@ public class ResponseHandler {
         this.actionHandlers.put(Action.SUBMIT_PROPOSAL, new SubmitProposalResponseHandler());
         this.actionHandlers.put(Action.GAME_STATS, new GameStatsResponseHandler());
         this.actionHandlers.put(Action.PERSONAL_STATS, new PersonalStatsResponseHandler());
+        this.actionHandlers.put(Action.LEADERBOARD, new LeaderboardResponseHandler());
     }
 
     public BaseMenu handleResponse(Response response, BaseMenu currentMenu) {
