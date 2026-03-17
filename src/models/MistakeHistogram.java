@@ -3,8 +3,9 @@ package models;
 /**
  * Represents a histogram that tracks the number of mistakes made in games.
  * <p>
- * The histogram stores counts for games with 0 to 4 mistakes, and a special
- * bucket for games with 5 or more mistakes (considered "not finished").
+ * The histogram stores counts for completed games with 0 to 4 mistakes, and a
+ * special
+ * bucket for games "not finished").
  * </p>
  * <ul>
  * <li>Index 0: 0 mistakes (perfect game)</li>
@@ -12,7 +13,7 @@ package models;
  * <li>Index 2: 2 mistakes</li>
  * <li>Index 3: 3 mistakes</li>
  * <li>Index 4: 4 mistakes (game lost)</li>
- * <li>Index 5: 5 or more mistakes (not finished)</li>
+ * <li>Index 5: (not finished)</li>
  * </ul>
  */
 public class MistakeHistogram {
