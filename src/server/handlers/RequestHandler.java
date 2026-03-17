@@ -27,6 +27,7 @@ public class RequestHandler {
         actionHandlers.put(Action.SUBMIT_PROPOSAL, new SubmitProposalRequestHandler(gameManager));
         actionHandlers.put(Action.GAME_STATS, new GameStatsRequestHandler(gameManager));
         actionHandlers.put(Action.PERSONAL_STATS, new PersonalStatsRequestHandler());
+        actionHandlers.put(Action.LEADERBOARD, new LeaderboardRequestHandler());
     }
 
     public Response handleRequest(Request request, Session session) {
