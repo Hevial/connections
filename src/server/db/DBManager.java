@@ -471,7 +471,7 @@ public class DBManager {
                 int perfectGame = newStats.getMistakes() == 0 && newStats.isWinner() ? 1 : 0;
                 MistakeHistogram mistakeHistogram = new MistakeHistogram();
                 mistakeHistogram.increment(newStats.getMistakes());
-                currPlayersStats.put(userId, new UserStats(1, 1, 1, perfectGame, mistakeHistogram));
+                currPlayersStats.put(userId, new UserStats(1, 1, 1, perfectGame, 0, mistakeHistogram));
                 continue;
             }
 
@@ -498,6 +498,8 @@ public class DBManager {
             if (newStats.isLoser() || !newStats.isCompleted()) {
                 existingStats.resetCurrentStreak();
             }
+
+            existingStats.setScore(existingStats.getScore() + newStats.getScore());
         }
 
         try (FileWriter writer = new FileWriter(statsPath)) {
