@@ -13,17 +13,19 @@ public class UserStats {
     private int currentStreak;
     private int maxStreak;
     private int perfectPuzzles;
+    private int score;
     private MistakeHistogram mistakeHistogram; // Index 0: 1 mistake, Index 1: 2 mistakes, ..., Index 3: 4 mistakes,
                                                // Index
                                                // 4: not finished
 
     public UserStats(int puzzlesCompleted, int currentStreak,
-            int maxStreak, int perfectPuzzles, MistakeHistogram mistakeHistogram) {
+            int maxStreak, int perfectPuzzles, int score, MistakeHistogram mistakeHistogram) {
         this.puzzlesCompleted = puzzlesCompleted;
         this.currentStreak = currentStreak;
         this.maxStreak = maxStreak;
         this.perfectPuzzles = perfectPuzzles;
         this.mistakeHistogram = mistakeHistogram;
+        this.score = score;
 
         this.winRate = calculateWinRate();
         this.lossRate = calculateLossRate();
@@ -55,6 +57,14 @@ public class UserStats {
 
     public void resetCurrentStreak() {
         this.currentStreak = 0;
+    }
+
+    public int getScore() {
+        return score;
+    }
+
+    public void setScore(int score) {
+        this.score = score;
     }
 
     /**
@@ -172,6 +182,7 @@ public class UserStats {
         sb.append(String.format("║ %-30s %37d ║\n", "Current streak:", currentStreak));
         sb.append(String.format("║ %-30s %37d ║\n", "Max streak:", maxStreak));
         sb.append(String.format("║ %-30s %37d ║\n", "Perfect puzzles:", perfectPuzzles));
+        sb.append(String.format("║ %-30s %37d ║\n", "Total Score:", score));
 
         sb.append("╠══════════════════════════════════════════════════════════════════════╣\n");
         sb.append(mistakeHistogram.toFormattedString());
