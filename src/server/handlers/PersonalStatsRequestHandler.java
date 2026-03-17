@@ -28,7 +28,7 @@ public class PersonalStatsRequestHandler implements RequestActionHandler {
         }
 
         return new Response(Action.PERSONAL_STATS, StatusCodes.NOT_FOUND,
-                "No stats found for user" + session.getUsername(), null);
+                "No stats found for user " + session.getUsername(), null);
 
     }
 
