@@ -2,6 +2,8 @@ package client.menus;
 
 import java.util.Scanner;
 import java.util.function.Supplier;
+
+import models.LeaderboardReq;
 import models.Request;
 
 import java.util.ArrayList;
@@ -123,4 +125,69 @@ public class UserMenu extends BaseMenu {
         return gameId;
     }
 
+    @Override
+    public LeaderboardReq getLeaderboardRequest() {
+
+        resetScreen();
+        String choises = """
+                ╠ Scegli la classifica da visualizzare:
+                ║ 1. Classifica generale
+                ║ 2. Top K in classifica
+                ║ 3. Posizione giocatore in classifica
+                ║
+                """;
+        String inputString = "";
+
+        System.out.print(choises);
+        System.out.print("╠ Inserisci la tua scelta: ");
+        String input = scanner.nextLine().trim();
+
+        inputString = "╠ Inserisci la tua scelta: " + input;
+
+        while (input == null || input.isEmpty() || !input.matches("[1-3]")) {
+            resetScreen();
+            System.out.println(choises);
+            System.out.print("╠ Scelta non valida. Inserisci 1, 2 o 3: ");
+            input = scanner.nextLine().trim();
+            inputString = "╠ Scelta non valida. Inserisci 1, 2 o 3: " + input;
+        }
+
+        if (input.equals("1")) {
+            return new LeaderboardReq();
+        } else if (input.equals("2")) {
+            int k = -1;
+            String errMessage = "";
+            while (k <= 0) {
+                resetScreen();
+                System.out.print(choises);
+                System.out.println(inputString);
+                if (!errMessage.isEmpty()) {
+                    System.out.println("╠ " + errMessage);
+                }
+                System.out.println("╠ Inserisci il numero di top giocatori da visualizzare (K): ");
+                String kInput = scanner.nextLine().trim();
+                errMessage = "";
+                try {
+                    k = Integer.parseInt(kInput.trim());
+                    if (k <= 0) {
+                        errMessage = "Input non valido. K deve essere un numero positivo.";
+                    }
+                } catch (NumberFormatException e) {
+                    errMessage = "╠ Input non valido. Inserisci un numero positivo per K.";
+                }
+            }
+            return new LeaderboardReq(k);
+        } else { // input.equals("3")
+            String playerName = "";
+            while (playerName.isEmpty()) {
+                resetScreen();
+                System.out.print(choises);
+                System.out.println(inputString);
+                System.out.print("╠ Inserisci il nome del giocatore: ");
+                playerName = scanner.nextLine().trim();
+            }
+
+            return new LeaderboardReq(playerName);
+        }
+    }
 }

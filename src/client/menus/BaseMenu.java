@@ -7,6 +7,7 @@ import java.util.function.Supplier;
 
 import client.RequestBuilder;
 import models.AuthRequest;
+import models.LeaderboardReq;
 import models.Request;
 import models.User;
 
@@ -184,6 +185,10 @@ public abstract class BaseMenu {
 
     public int getGameId() {
         throw new UnsupportedOperationException("Game ID input is not supported in this menu");
+    }
+
+    public LeaderboardReq getLeaderboardRequest() {
+        throw new UnsupportedOperationException("Leaderboard request is not supported in this menu");
     }
 
     /* Template Methods for Menu Display */
