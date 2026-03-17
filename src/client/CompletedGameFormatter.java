@@ -91,13 +91,20 @@ public final class CompletedGameFormatter {
         return sb.toString();
     }
 
-    /*
-     * Se la partita è conclusa serve a ricevere il numero di
-     * giocatori che hanno partecipato alla partita, il numero di giocatori che
-     * hanno
-     * concluso la partita, il numero di giocatori che hanno concluso la partita con
-     * una vittoria ed il punteggio medio dei giocatori che hanno partecipato alla
-     * partita.
+    /**
+     * Builds a compact, CLI-friendly summary of a completed game.
+     *
+     * <p>
+     * The summary contains a header, a separator line and a small set of
+     * aggregate statistics: game id, total number of players, number of
+     * winners, number of players who completed the game and the average score.
+     * The output uses box-drawing characters and is intended for direct
+     * printing to a terminal.
+     * </p>
+     *
+     * @param game the {@link CompletedGame} instance to summarize; must not be
+     *             {@code null}
+     * @return a multi-line {@link String} containing the formatted summary
      */
     public static String formatSummary(CompletedGame game) {
         StringBuilder sb = new StringBuilder();
