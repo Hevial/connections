@@ -470,7 +470,11 @@ public class DBManager {
             if (!currPlayersStats.containsKey(userId)) {
                 int perfectGame = newStats.getMistakes() == 0 && newStats.isWinner() ? 1 : 0;
                 MistakeHistogram mistakeHistogram = new MistakeHistogram();
-                mistakeHistogram.increment(newStats.getMistakes());
+                if (!newStats.isCompleted()) {
+                    mistakeHistogram.increment(5); // "not finished" bucket
+                } else {
+                    mistakeHistogram.increment(newStats.getMistakes());
+                }
                 currPlayersStats.put(userId, new UserStats(1, 1, 1, perfectGame, 0, mistakeHistogram));
                 continue;
             }
