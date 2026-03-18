@@ -420,6 +420,11 @@ public class DBManager {
      */
     synchronized public CompletedGame getCompletedGameById(int gameId) {
         String historyPath = config.getGameHistoryPath();
+        File historyFile = new File(historyPath);
+        if (!historyFile.exists()) {
+            // No history file yet -> game not found
+            return null;
+        }
 
         try (FileReader reader = new FileReader(historyPath)) {
             Type type = new TypeToken<Map<String, CompletedGame>>() {
@@ -430,7 +435,10 @@ public class DBManager {
             }
             return gameStateMap.get(String.valueOf(gameId));
         } catch (Exception e) {
-            throw new RuntimeException("Failed to read game history from database", e);
+            // Return null on read/parse errors instead of throwing to allow caller
+            // to treat missing/invalid history as "not found".
+            System.err.println("Warning: failed to read game history: " + e.getMessage());
+            return null;
         }
     }
 
@@ -561,6 +569,11 @@ public class DBManager {
      */
     synchronized public UserStats getUserStats(String userId) {
         String statsPath = config.getUsersStatsPath();
+        File statsFile = new File(statsPath);
+        if (!statsFile.exists()) {
+            // No stats file yet -> user has no stats
+            return null;
+        }
 
         try (FileReader reader = new FileReader(statsPath)) {
             Type type = new TypeToken<Map<String, UserStats>>() {
@@ -571,12 +584,31 @@ public class DBManager {
             }
             return gameStateMap.get(userId);
         } catch (Exception e) {
-            throw new RuntimeException("Failed to read user stats from database", e);
+            System.err.println("Warning: failed to read user stats from database: " + e.getMessage());
+            return null;
         }
     }
 
     synchronized public Map<String, UserStats> getAllUsersStats() {
         String statsPath = config.getUsersStatsPath();
+
+        File statsFile = new File(statsPath);
+        try {
+            if (!statsFile.exists()) {
+                // ensure parent dir exists
+                File parent = statsFile.getParentFile();
+                if (parent != null && !parent.exists())
+                    parent.mkdirs();
+                // create an empty JSON map file to avoid FileNotFound on read
+                try (FileWriter writer = new FileWriter(statsPath)) {
+                    writer.write("{}");
+                }
+                return Map.of();
+            }
+        } catch (Exception e) {
+            System.err.println("Warning: failed to create users stats file: " + e.getMessage());
+            return Map.of();
+        }
 
         try (FileReader reader = new FileReader(statsPath)) {
             Type type = new TypeToken<Map<String, UserStats>>() {
@@ -587,7 +619,8 @@ public class DBManager {
             }
             return gameStateMap;
         } catch (Exception e) {
-            throw new RuntimeException("Failed to read user stats from database", e);
+            System.err.println("Warning: failed to read users stats from database: " + e.getMessage());
+            return Map.of();
         }
     }
 
