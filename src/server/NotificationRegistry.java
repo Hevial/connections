@@ -2,6 +2,8 @@ package server;
 
 import java.net.InetSocketAddress;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
 
@@ -77,6 +79,16 @@ public class NotificationRegistry {
      */
     public static Collection<InetSocketAddress> getAllAddresses() {
         return registry.values();
+    }
+
+    /**
+     * Returns a copy of the current registry mapping (userId -> address).
+     *
+     * The returned map is a snapshot and modifications to it do not affect the
+     * internal registry.
+     */
+    public static Map<String, InetSocketAddress> getAllEntries() {
+        return new HashMap<>(registry);
     }
 
 }

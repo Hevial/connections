@@ -146,29 +146,28 @@ public class GameManager implements Runnable {
         });
     }
 
-    private void saveInGameHistory() {
+    // private void saveInGameHistory() {
 
-        DBManager dbManager = DBManager.getInstance();
-        CompletedGame completedGame = new CompletedGame(currentGameState.getGameId(), playerStatesByUserId,
-                currentGameState.getGame().getGroups());
-        try {
-            dbManager.saveGameHistory(completedGame);
-            // TODO notify clients about game end
-            NotificationSender.notifyGameEnd(completedGame);
-        } catch (Exception e) {
-            System.out.println("Failed to save game history: " + e.getMessage());
-        }
+    // DBManager dbManager = DBManager.getInstance();
+    // CompletedGame completedGame = new CompletedGame(currentGameState.getGameId(),
+    // playerStatesByUserId,
+    // currentGameState.getGame().getGroups());
+    // try {
+    // dbManager.saveGameHistory(completedGame);
+    // } catch (Exception e) {
+    // System.out.println("Failed to save game history: " + e.getMessage());
+    // }
 
-    }
+    // }
 
-    private void updatePlayersStats() {
-        DBManager dbManager = DBManager.getInstance();
-        try {
-            dbManager.updateUsersStats(playerStatesByUserId);
-        } catch (Exception e) {
-            System.out.println("Failed to update users stats: " + e.getMessage());
-        }
-    }
+    // private void updatePlayersStats() {
+    // DBManager dbManager = DBManager.getInstance();
+    // try {
+    // dbManager.updateUsersStats(playerStatesByUserId);
+    // } catch (Exception e) {
+    // System.out.println("Failed to update users stats: " + e.getMessage());
+    // }
+    // }
 
     @Override
     public void run() {
@@ -180,9 +179,18 @@ public class GameManager implements Runnable {
             // Before starting a new round, save the completed game to history and update
             // player stats in the database. This ensures that we capture the final state of
             // the game and player performance before resetting for the next round.
+            CompletedGame completedGame = null;
             if (currentGameState != null) {
-                saveInGameHistory();
-                updatePlayersStats();
+                completedGame = new CompletedGame(currentGameState.getGameId(), playerStatesByUserId,
+                        currentGameState.getGame().getGroups());
+
+                try {
+                    dbManager.saveGameHistory(completedGame);
+                    dbManager.updateUsersStats(playerStatesByUserId);
+                } catch (Exception e) {
+                    System.out.println("Failed to save game history or update stats: " + e.getMessage());
+                }
+
             }
 
             playerStatesByUserId.clear(); // Clear live player states for the new round
@@ -190,8 +198,17 @@ public class GameManager implements Runnable {
             Game currentGame = dbManager.loadNextGame();
             currentGameState = new GameState(currentGame, System.currentTimeMillis(), gameDuration);
 
-            // New round starts here: drop old in-memory player states.
-            playerStatesByUserId.clear();
+            // Notify clients about the completed game and provide the new game snapshot.
+            if (completedGame != null) {
+                try {
+                    NotificationSender.notifyGameEnd(completedGame, currentGameState);
+                } catch (Exception e) {
+                    System.out.println("Failed to send game-end notifications: " + e.getMessage());
+                }
+            }
+
+            // TODO CHECK IF CLEARING PLAYER STATES BEFORE OR AFTER LOADING THE NEW GAME IS
+            // BETTER
             System.out.println("\nNew game started: ");
             currentGameState.printGameState();
         } catch (Exception e) {
