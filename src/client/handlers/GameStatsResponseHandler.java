@@ -10,6 +10,10 @@ import models.CompletedGame;
 import models.OngoingGameStats;
 import models.enums.StatusCodes;
 
+/**
+ * Handler for responses returning game statistics. It can display ongoing game
+ * stats or a completed-game summary depending on server payload.
+ */
 public class GameStatsResponseHandler implements ResponseActionHandler {
 
     @Override

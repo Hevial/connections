@@ -5,6 +5,9 @@ import com.google.gson.JsonElement;
 import client.menus.BaseMenu;
 import models.enums.StatusCodes;
 
+/**
+ * Handler for server responses related to user registration.
+ */
 public class RegisterResponseHandler implements ResponseActionHandler {
 
     @Override

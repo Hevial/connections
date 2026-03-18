@@ -11,6 +11,10 @@ import models.PlayerCompletedGame;
 import models.PlayerGameState;
 import models.enums.StatusCodes;
 
+/**
+ * Handler for game status responses. Updates the UI with the player's live
+ * game state or the completed-game summary when available.
+ */
 public class GamestatusResponseHandler implements ResponseActionHandler {
 
     @Override

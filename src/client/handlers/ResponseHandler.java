@@ -27,6 +27,16 @@ public class ResponseHandler {
         this.actionHandlers.put(Action.LEADERBOARD, new LeaderboardResponseHandler());
     }
 
+    /**
+     * Central dispatcher that routes a server {@link Response} to the
+     * corresponding {@link ResponseActionHandler} based on the
+     * {@link models.enums.Action}.
+     *
+     * @param response    the server response to process (may be null)
+     * @param currentMenu the current UI menu instance that may be updated by
+     *                    handlers
+     * @return the next {@link BaseMenu} to display (may be the same instance)
+     */
     public BaseMenu handleResponse(Response response, BaseMenu currentMenu) {
         if (response == null) {
             System.err.println("Received null response");

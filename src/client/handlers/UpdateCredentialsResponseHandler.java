@@ -7,6 +7,10 @@ import client.menus.BaseMenu;
 import models.UpdateCredentials;
 import models.enums.StatusCodes;
 
+/**
+ * Handler for responses to update-credentials requests. Updates the UI message
+ * and clears the current action after processing.
+ */
 public class UpdateCredentialsResponseHandler implements ResponseActionHandler {
 
     @Override

@@ -1,5 +1,8 @@
 package server.db;
 
+/**
+ * Status codes returned by {@link server.db.DBManager} operations.
+ */
 public enum DBStatus {
 
     SUCCESS,

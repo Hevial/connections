@@ -7,10 +7,11 @@ import client.menus.BaseMenu;
 import client.menus.MainMenu;
 import models.enums.StatusCodes;
 
+/**
+ * Handler for logout responses. On successful logout the client stops the
+ * notification keepalive and transitions back to the main menu.
+ */
 public class LogoutResponseHandler implements ResponseActionHandler {
-
-    public LogoutResponseHandler() {
-    }
 
     @Override
     public BaseMenu handle(StatusCodes statusCode, String message, JsonElement data, BaseMenu currentMenu) {

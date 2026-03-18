@@ -10,8 +10,23 @@ import java.util.concurrent.TimeUnit;
 
 import server.handlers.RequestHandler;
 
+/**
+ * Server application entry point and TCP accept loop.
+ *
+ * <p>
+ * This class loads the server configuration, starts the periodic
+ * {@link GameManager} scheduler, spins up the UDP notification listener and
+ * accepts incoming TCP client connections, handing each connection to a
+ * {@link ServerWorker} executed by a thread pool.
+ * </p>
+ */
 public class ServerMain {
 
+    /**
+     * Process command-line arguments and start the server.
+     *
+     * @param args ignored
+     */
     public static void main(String[] args) {
         try {
             ServerConfig config = ServerConfig.loadConfig();
@@ -22,6 +37,11 @@ public class ServerMain {
 
     }
 
+    /**
+     * Initialize server resources and run the accept loop.
+     *
+     * @param config server configuration loaded from JSON
+     */
     private static void startServer(ServerConfig config) {
         try (ServerSocketChannel serverSocket = ServerSocketChannel.open()) {
             serverSocket.bind(new InetSocketAddress(config.getHost(), config.getPort()));

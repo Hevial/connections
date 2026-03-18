@@ -10,6 +10,14 @@ import models.Response;
 import server.db.DBManager;
 import server.handlers.RequestHandler;
 
+/**
+ * Worker responsible for handling a single client TCP connection.
+ *
+ * <p>The worker reads JSON requests from the socket, dispatches them to the
+ * provided {@link RequestHandler}, and writes JSON responses back to the
+ * client. It also maintains a per-connection {@link Session} instance that is
+ * used to track authentication state for the connected user.</p>
+ */
 public class ServerWorker implements Runnable {
     private final RequestHandler requestHandler;
     private final SocketChannel clientSocket;

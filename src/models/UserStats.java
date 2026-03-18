@@ -1,5 +1,14 @@
 package models;
 
+/**
+ * Aggregated statistics for a user.
+ *
+ * <p>
+ * This class stores counters and derived metrics such as win/loss rates,
+ * streaks, score and a {@link MistakeHistogram} describing distribution of
+ * mistakes. It provides convenience methods to update statistics and produce
+ * a CLI-friendly formatted summary.
+ */
 public class UserStats {
 
     /*

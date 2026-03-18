@@ -8,6 +8,10 @@ import client.menus.BaseMenu;
 import models.PlayerGameState;
 import models.enums.StatusCodes;
 
+/**
+ * Handler for responses to submit-proposal actions. Updates the player's
+ * local game state view and displays the server message.
+ */
 public class SubmitProposalResponseHandler implements ResponseActionHandler {
 
     @Override

@@ -10,10 +10,12 @@ import client.menus.UserMenu;
 import models.PlayerGameState;
 import models.enums.StatusCodes;
 
+/**
+ * Handler for login responses. On success transitions the UI to
+ * {@link client.menus.UserMenu} and initializes per-player data. On failure
+ * it leaves the current menu unchanged and shows the error message.
+ */
 public class LoginResponseHandler implements ResponseActionHandler {
-
-    public LoginResponseHandler() {
-    }
 
     @Override
     public BaseMenu handle(StatusCodes statusCode, String message, JsonElement data, BaseMenu currentMenu) {
@@ -27,7 +29,7 @@ public class LoginResponseHandler implements ResponseActionHandler {
             return currentMenu;
         }
 
-        // If login was successful, transition to the user menu
+        // Successful login: build UserMenu with game data and username
         Gson gson = new Gson();
         PlayerGameState gameState = gson.fromJson(data.getAsJsonObject().get("playerGameState"), PlayerGameState.class);
         String username = data.getAsJsonObject().get("username").getAsString();
@@ -38,7 +40,7 @@ public class LoginResponseHandler implements ResponseActionHandler {
         userMenu.setLastMessage(msg);
         userMenu.setCurrAction(null);
 
-        // Send UDP poke now that login succeeded so server registers observed address
+        // Send UDP poke and start keepalive so server can register the client's address
         try {
             ClientMain.sendLoginPoke(username);
             // start periodic keepalive to maintain NAT mapping

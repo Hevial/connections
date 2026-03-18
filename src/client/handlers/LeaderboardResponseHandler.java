@@ -12,6 +12,10 @@ import client.menus.BaseMenu;
 import models.LeaderboardEntry;
 import models.enums.StatusCodes;
 
+/**
+ * Handler that displays a formatted leaderboard when the server returns a list
+ * of {@link LeaderboardEntry} objects.
+ */
 public class LeaderboardResponseHandler implements ResponseActionHandler {
 
     @Override

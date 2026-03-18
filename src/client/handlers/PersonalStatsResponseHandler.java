@@ -7,6 +7,9 @@ import client.menus.BaseMenu;
 import models.UserStats;
 import models.enums.StatusCodes;
 
+/**
+ * Handler for responses returning personal statistics for the logged-in user.
+ */
 public class PersonalStatsResponseHandler implements ResponseActionHandler {
 
     @Override
