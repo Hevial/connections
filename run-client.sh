@@ -1,0 +1,4 @@
+#!/bin/bash
+
+echo "Starting client..."
+java -cp "bin:lib/gson-2.13.2.jar" client.ClientMain
