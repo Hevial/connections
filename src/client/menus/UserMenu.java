@@ -6,6 +6,7 @@ import models.LeaderboardReq;
 import models.Request;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -92,7 +93,7 @@ public class UserMenu extends BaseMenu {
                 continue;
             }
 
-            if (new java.util.HashSet<>(words).size() != 4) {
+            if (new HashSet<>(words).size() != 4) {
                 System.out.println("╠ Input non valido: le 4 parole devono essere diverse.");
                 continue;
             }

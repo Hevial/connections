@@ -1,5 +1,6 @@
 package client;
 
+import java.net.ConnectException;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
@@ -178,14 +179,14 @@ public class ClientMain {
                 String responseStr = new String(bytes, StandardCharsets.UTF_8);
 
                 // Debug: print the raw response string from the server
-                System.out.println("Risposta dal server: " + responseStr);
+                // System.out.println("Risposta dal server: " + responseStr);
 
                 // Parse response
                 Response res = gson.fromJson(responseStr, Response.class);
 
                 currentMenu = responseHandler.handleResponse(res, currentMenu);
             }
-        } catch (java.net.ConnectException ce) {
+        } catch (ConnectException ce) {
             System.out.println("Impossibile connettersi al server: " + ce.getMessage());
         } catch (Exception e) {
             e.printStackTrace();

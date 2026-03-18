@@ -12,6 +12,7 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetSocketAddress;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -150,7 +151,7 @@ public class NotificationSender {
                     completedGame != null ? completedGame.getNumberOfWinners() : 0,
                     completedGame != null ? completedGame.getNumberOfCompleters() : 0,
                     completedGame != null ? completedGame.getAverageScore() : 0.0,
-                    completedGame != null ? completedGame.getGroups() : java.util.List.of(),
+                    completedGame != null ? completedGame.getGroups() : List.of(),
                     stats);
             envelope.add("PlayerCompletedGame", GSON.toJsonTree(playerCompletedGame));
         } catch (Exception e) {

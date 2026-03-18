@@ -1,6 +1,7 @@
 package server.handlers;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -92,7 +93,7 @@ public class SubmitProposalRequestHandler implements RequestActionHandler {
             proposalWordsList.add(element.getAsString().trim().toUpperCase());
         }
 
-        Set<String> proposalWords = new java.util.HashSet<>(proposalWordsList);
+        Set<String> proposalWords = new HashSet<>(proposalWordsList);
 
         if (playerGameState.isWinner()) {
             return new Response(Action.SUBMIT_PROPOSAL, StatusCodes.BAD_REQUEST,
@@ -139,7 +140,7 @@ public class SubmitProposalRequestHandler implements RequestActionHandler {
         // Check if the player has found all groups except one, and if so, automatically
         // find the last group for them
         if (playerGameState.getWordsLeft().size() == 4) {
-            Set<String> remainingWords = new java.util.HashSet<>(playerGameState.getWordsLeft());
+            Set<String> remainingWords = new HashSet<>(playerGameState.getWordsLeft());
             String remainingTheme = currGameState.getProposalTheme(remainingWords);
             if (remainingTheme != null) {
                 playerGameState.addFoundGroup(remainingTheme, remainingWords);

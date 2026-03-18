@@ -1,5 +1,7 @@
 package models;
 
+import java.util.UUID;
+
 /**
  * Represents a user with authentication credentials.
  * 
@@ -15,7 +17,7 @@ public class User {
     private String password;
 
     public User(String username, String password) {
-        this.userId = java.util.UUID.randomUUID().toString();
+        this.userId = UUID.randomUUID().toString();
         this.username = username;
         this.password = password;
     }
