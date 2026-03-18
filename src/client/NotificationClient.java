@@ -1,7 +1,12 @@
 package client;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+
+import models.CompletedGame;
+import models.PlayerCompletedGame;
+import models.PlayerGameState;
 
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
@@ -136,11 +141,32 @@ public class NotificationClient implements AutoCloseable, Runnable {
                 JsonObject obj = GSON.fromJson(s, JsonObject.class);
                 if (obj == null)
                     continue;
-                if (obj.has("GameEndNotification")) {
-                    models.CompletedGame g = GSON.fromJson(obj.get("GameEndNotification"), models.CompletedGame.class);
-                    String summary = "╠ NOTIFICA DI FINE PARTITA \n" + CompletedGameFormatter.formatSummary(g);
-                    ClientMain.pushNotification(summary);
+
+                StringBuilder sb = new StringBuilder();
+                sb.append("╠ NOTIFICA DI FINE PARTITA \n");
+
+                JsonElement completedGameElem = obj.get("CompletedGame");
+                if (completedGameElem != null && completedGameElem.isJsonObject()) {
+                    CompletedGame g = GSON.fromJson(completedGameElem, CompletedGame.class);
+                    sb.append(CompletedGameFormatter.formatSummary(g));
+
                 }
+
+                JsonElement playerCompletedGameElem = obj.get("PlayerCompletedGame");
+                if (playerCompletedGameElem != null && playerCompletedGameElem.isJsonObject()) {
+                    PlayerCompletedGame pg = GSON.fromJson(playerCompletedGameElem, PlayerCompletedGame.class);
+                    sb.append(CompletedGameFormatter.formatForUser(pg));
+                }
+
+                String gameData = null;
+                JsonElement playerGameStateElem = obj.get("PlayerGameState");
+                if (playerGameStateElem != null && playerGameStateElem.isJsonObject()) {
+                    PlayerGameState newGameState = GSON.fromJson(playerGameStateElem, PlayerGameState.class);
+                    gameData = PlayerGameStateFormatter.format(newGameState);
+                    sb.append("║\n").append("╠ Nuova partita iniziata! Preparati per la prossima sfida.\n");
+                }
+
+                ClientMain.pushNotification(sb.toString(), gameData);
             } catch (Exception e) {
                 if (running.get())
                     LOG.log(Level.WARNING, "UDP receive error", e);

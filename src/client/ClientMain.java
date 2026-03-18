@@ -32,17 +32,22 @@ public class ClientMain {
         return notificationPending;
     }
 
-    public static void pushNotification(String msg) {
+    public static void pushNotification(String msg, String gameData) {
         // Mark notification as pending and print a concise inline message.
         // We avoid calling menu redraws from this async thread to prevent
         // clearing the user's input. Instead we print the notification and
         // reprint the simple prompt so the user sees it immediately.
         notificationMessage = msg;
         notificationPending = true;
+
+        if (gameData != null) {
+            currentMenu.setGameData(gameData);
+        }
+
         try {
             synchronized (System.out) {
                 System.out.println();
-                System.out.println("╠ NOTIFICA: " + msg);
+                System.out.println(msg);
                 // clear any queued lines the user may have submitted
                 try {
                     InputReader.clearQueue();
@@ -53,17 +58,6 @@ public class ClientMain {
             }
         } catch (Exception ignored) {
         }
-    }
-
-    /**
-     * Central handler to register an incoming notification and force the UI
-     * back to the main menu. Safe to call from menu code when consuming a
-     * pending notification.
-     */
-    public static void handleIncomingNotification(String msg) {
-        // Only record the pending notification; do NOT switch menus here.
-        notificationMessage = msg;
-        notificationPending = true;
     }
 
     /**
