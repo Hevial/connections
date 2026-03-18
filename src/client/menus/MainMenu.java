@@ -2,7 +2,7 @@ package client.menus;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Scanner;
+// Scanner no longer required; InputReader handles input
 import java.util.function.Supplier;
 
 import models.Request;
@@ -11,8 +11,8 @@ public class MainMenu extends BaseMenu {
 
     private final Map<Integer, Supplier<Request>> requestBuilders;
 
-    public MainMenu(Scanner scanner) {
-        super(scanner);
+    public MainMenu() {
+        super();
         this.requestBuilders = Map.of(
                 1, requestBuilder::buildLoginRequest,
                 2, requestBuilder::buildRegisterRequest,

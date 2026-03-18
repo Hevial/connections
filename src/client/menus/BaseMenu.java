@@ -2,10 +2,12 @@ package client.menus;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Scanner;
+/* Scanner removed: InputReader handles System.in */
 import java.util.function.Supplier;
 
 import client.RequestBuilder;
+import client.ClientMain;
+import client.InputReader;
 import models.AuthRequest;
 import models.LeaderboardReq;
 import models.Request;
@@ -36,7 +38,7 @@ import models.User;
  */
 public abstract class BaseMenu {
 
-    protected final Scanner scanner;
+    // Input is handled centrally by InputReader; no Scanner stored here.
     protected final RequestBuilder requestBuilder;
 
     // Session and display state
@@ -48,8 +50,7 @@ public abstract class BaseMenu {
     protected boolean shouldShowGameData;
     protected boolean shouldShowGeneralData;
 
-    protected BaseMenu(Scanner scanner) {
-        this.scanner = scanner;
+    protected BaseMenu() {
         this.requestBuilder = new RequestBuilder(this);
     }
 
@@ -123,32 +124,49 @@ public abstract class BaseMenu {
 
     public int getChoice() {
         setCurrAction(null);
-        String prompt = "╠ Seleziona un'opzione: ";
-        System.out.print(prompt);
-
+        String prompt = "Seleziona un'opzione: ";
         while (true) {
-            if (!scanner.hasNextLine()) {
-                // TODO EOF: esci o tratta come logout
-                return 0;
+            String input = requestInput(prompt, true);
+            if (input == null) {
+                // notification interrupted input -> signal caller to retry menu loop
+                return -1;
             }
-            String input = scanner.nextLine().trim();
+            if (input.isBlank()) {
+                resetScreen();
+                continue;
+            }
             try {
-                int choice = Integer.parseInt(input);
+                int choice = Integer.parseInt(input.trim());
                 if (getRequestBuilders().containsKey(choice)) {
                     return choice;
                 }
             } catch (NumberFormatException ignored) {
             }
-            resetScreen();
-            setCurrAction(null);
-            System.out.print("╠ Scelta non valida. Riprova: ");
+            System.out.println("╠ Scelta non valida. Riprova.");
         }
     }
 
-    public String requestInput(String prompt) {
-        resetScreen();
+    public String requestInput(String prompt, boolean resetAfterInput) {
         System.out.print("╠ " + prompt);
-        return scanner.nextLine().trim();
+        while (true) {
+            String line = InputReader.pollLine(200);
+            if (line == null) {
+                String pending = ClientMain.consumeNotification();
+                if (pending != null) {
+                    resetScreen();
+                    setGeneralData(pending);
+                    showGeneralData();
+                    return null;
+                }
+                continue;
+            }
+
+            if (resetAfterInput) {
+                resetScreen();
+            }
+
+            return line.trim();
+        }
     }
 
     /**
@@ -163,10 +181,12 @@ public abstract class BaseMenu {
      */
     public AuthRequest requestCredentials(String usernamePrompt, String passwordPrompt) {
         resetScreen();
-        System.out.print("╠ " + usernamePrompt);
-        String username = scanner.nextLine();
-        System.out.print("╠ " + passwordPrompt);
-        String password = scanner.nextLine();
+        String username = requestInput(usernamePrompt, false);
+        if (username == null)
+            return null;
+        String password = requestInput(passwordPrompt, true);
+        if (password == null)
+            return null;
         return new AuthRequest(username, password);
     }
 
@@ -287,7 +307,6 @@ public abstract class BaseMenu {
         }
     }
 
-    // TODO: Maybe this should also reset username, currAction and data?
     protected void resetScreen() {
         lastMessage = null;
         clearScreen();

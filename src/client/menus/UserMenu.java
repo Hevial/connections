@@ -1,6 +1,5 @@
 package client.menus;
 
-import java.util.Scanner;
 import java.util.function.Supplier;
 
 import models.LeaderboardReq;
@@ -14,8 +13,8 @@ import java.util.Map;
 public class UserMenu extends BaseMenu {
     private final Map<Integer, Supplier<Request>> requestBuilders;
 
-    public UserMenu(Scanner scanner) {
-        super(scanner);
+    public UserMenu() {
+        super();
         this.requestBuilders = Map.of(
                 1, requestBuilder::buildMakeProposalRequest,
                 2, requestBuilder::buildCurrentGameStatusRequest,
@@ -63,14 +62,15 @@ public class UserMenu extends BaseMenu {
         resetScreen();
         while (true) {
             showGameData();
-            System.out.print(
-                    "╠ Inserisci le parole per la proposta (esattamente 4 parole separate da virgola): ");
-
-            String wordsString = scanner.nextLine().trim();
+            String wordsString = requestInput(
+                    "Inserisci le parole per la proposta (esattamente 4 parole separate da virgola): ", true);
+            if (wordsString == null) {
+                // either notification arrived or user cancelled
+                return null;
+            }
             String[] rawWords = wordsString.split(",");
 
             if (rawWords.length != 4) {
-                resetScreen();
                 System.out.println("╠ Input non valido: devi inserire esattamente 4 parole separate da virgola.");
                 continue;
             }
@@ -88,13 +88,11 @@ public class UserMenu extends BaseMenu {
             }
 
             if (hasEmptyWord) {
-                resetScreen();
                 System.out.println("╠ Input non valido: le parole non possono essere vuote.");
                 continue;
             }
 
             if (new java.util.HashSet<>(words).size() != 4) {
-                resetScreen();
                 System.out.println("╠ Input non valido: le 4 parole devono essere diverse.");
                 continue;
             }
@@ -106,7 +104,11 @@ public class UserMenu extends BaseMenu {
     @Override
     public int getGameId() {
         int gameId = -1;
-        String input = requestInput("Inserisci l'ID della partita da visualizzare (-1 partita attuale): ");
+        String input = requestInput("Inserisci l'ID della partita da visualizzare (-1 partita attuale): ", true);
+        if (input == null) {
+            // interrupted by notification
+            return Integer.MIN_VALUE;
+        }
         input = input.trim();
         while (true) {
             try {
@@ -115,11 +117,17 @@ public class UserMenu extends BaseMenu {
                     break; // valid id entered
                 } else {
                     // negative id; prompt again
-                    input = requestInput("ID non valido. Inserisci un id numerico positivo (o -1 partita attuale): ");
+                    input = requestInput("ID non valido. Inserisci un id numerico positivo (o -1 partita attuale): ",
+                            true);
+                    if (input == null)
+                        return Integer.MIN_VALUE;
                 }
             } catch (NumberFormatException e) {
                 // non-numeric input; prompt again
-                input = requestInput("Input non valido. Inserisci un id numerico positivo (o -1 partita attuale): ");
+                input = requestInput("Input non valido. Inserisci un id numerico positivo (o -1 partita attuale): ",
+                        true);
+                if (input == null)
+                    return Integer.MIN_VALUE;
             }
         }
         return gameId;
@@ -127,7 +135,6 @@ public class UserMenu extends BaseMenu {
 
     @Override
     public LeaderboardReq getLeaderboardRequest() {
-
         resetScreen();
         String choises = """
                 ╠ Scegli la classifica da visualizzare:
@@ -136,58 +143,48 @@ public class UserMenu extends BaseMenu {
                 ║ 3. Posizione giocatore in classifica
                 ║
                 """;
-        String inputString = "";
 
         System.out.print(choises);
-        System.out.print("╠ Inserisci la tua scelta: ");
-        String input = scanner.nextLine().trim();
+        String input = requestInput("Inserisci la tua scelta: ", true);
+        if (input == null)
+            return null;
 
-        inputString = "╠ Inserisci la tua scelta: " + input;
-
-        while (input == null || input.isEmpty() || !input.matches("[1-3]")) {
-            resetScreen();
-            System.out.println(choises);
-            System.out.print("╠ Scelta non valida. Inserisci 1, 2 o 3: ");
-            input = scanner.nextLine().trim();
-            inputString = "╠ Scelta non valida. Inserisci 1, 2 o 3: " + input;
+        while (!input.matches("[1-3]")) {
+            System.out.print(choises);
+            input = requestInput("Scelta non valida. Inserisci 1, 2 o 3: ", true);
+            if (input == null)
+                return null;
         }
 
         if (input.equals("1")) {
             return new LeaderboardReq();
         } else if (input.equals("2")) {
             int k = -1;
-            String errMessage = "";
             while (k <= 0) {
-                resetScreen();
-                System.out.print(choises);
-                System.out.println(inputString);
-                if (!errMessage.isEmpty()) {
-                    System.out.println("╠ " + errMessage);
+                String kInput = requestInput("Inserisci il numero di top giocatori da visualizzare (K): ", true);
+                if (kInput == null)
+                    return null;
+
+                if (kInput.trim().isEmpty()) {
+                    continue;
                 }
-                System.out.println("╠ Inserisci il numero di top giocatori da visualizzare (K): ");
-                String kInput = scanner.nextLine().trim();
-                errMessage = "";
                 try {
                     k = Integer.parseInt(kInput.trim());
                     if (k <= 0) {
-                        errMessage = "Input non valido. K deve essere un numero positivo.";
+                        System.out.println("║ Input non valido. K deve essere un numero positivo.");
                     }
                 } catch (NumberFormatException e) {
-                    errMessage = "╠ Input non valido. Inserisci un numero positivo per K.";
+                    System.out.println("║ Input non valido. Inserisci un numero positivo per K.");
                 }
             }
             return new LeaderboardReq(k);
-        } else { // input.equals("3")
-            String playerName = "";
-            while (playerName.isEmpty()) {
-                resetScreen();
-                System.out.print(choises);
-                System.out.println(inputString);
-                System.out.print("╠ Inserisci il nome del giocatore: ");
-                playerName = scanner.nextLine().trim();
+        } else {
+            String playerName = requestInput("Inserisci il nome del giocatore: ", true);
+            while (playerName == null || playerName.isEmpty()) {
+                playerName = requestInput("Input non valido. Inserisci un nome di giocatore valido: ", true);
             }
 
-            return new LeaderboardReq(playerName);
+            return new LeaderboardReq(playerName.trim());
         }
     }
 }

@@ -1,10 +1,9 @@
 package client.handlers;
 
-import java.util.Scanner;
-
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 
+import client.ClientMain;
 import client.PlayerGameStateFormatter;
 import client.menus.BaseMenu;
 import client.menus.UserMenu;
@@ -13,10 +12,7 @@ import models.enums.StatusCodes;
 
 public class LoginResponseHandler implements ResponseActionHandler {
 
-    private final Scanner scanner;
-
-    public LoginResponseHandler(Scanner scanner) {
-        this.scanner = scanner;
+    public LoginResponseHandler() {
     }
 
     @Override
@@ -35,12 +31,20 @@ public class LoginResponseHandler implements ResponseActionHandler {
         Gson gson = new Gson();
         PlayerGameState gameState = gson.fromJson(data.getAsJsonObject().get("playerGameState"), PlayerGameState.class);
         String username = data.getAsJsonObject().get("username").getAsString();
-        BaseMenu userMenu = new UserMenu(scanner);
+        BaseMenu userMenu = new UserMenu();
         userMenu.setGameData(PlayerGameStateFormatter.format(gameState));
         userMenu.showGameData();
         userMenu.setUsername(username);
         userMenu.setLastMessage(msg);
         userMenu.setCurrAction(null);
+
+        // Send UDP poke now that login succeeded so server registers observed address
+        try {
+            ClientMain.sendLoginPoke(username);
+            // start periodic keepalive to maintain NAT mapping
+            ClientMain.startNotificationKeepalive(username);
+        } catch (Exception ignored) {
+        }
 
         return userMenu;
     }

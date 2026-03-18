@@ -2,7 +2,6 @@ package client.handlers;
 
 import java.util.EnumMap;
 import java.util.Map;
-import java.util.Scanner;
 
 import com.google.gson.JsonElement;
 
@@ -15,12 +14,12 @@ public class ResponseHandler {
 
     private final Map<Action, ResponseActionHandler> actionHandlers;
 
-    public ResponseHandler(Scanner scanner) {
+    public ResponseHandler() {
         this.actionHandlers = new EnumMap<>(Action.class);
         this.actionHandlers.put(Action.REGISTER, new RegisterResponseHandler());
-        this.actionHandlers.put(Action.LOGIN, new LoginResponseHandler(scanner));
+        this.actionHandlers.put(Action.LOGIN, new LoginResponseHandler());
         this.actionHandlers.put(Action.UPDATE_CREDENTIALS, new UpdateCredentialsResponseHandler());
-        this.actionHandlers.put(Action.LOGOUT, new LogoutResponseHandler(scanner));
+        this.actionHandlers.put(Action.LOGOUT, new LogoutResponseHandler());
         this.actionHandlers.put(Action.GAME_STATUS, new GamestatusResponseHandler());
         this.actionHandlers.put(Action.SUBMIT_PROPOSAL, new SubmitProposalResponseHandler());
         this.actionHandlers.put(Action.GAME_STATS, new GameStatsResponseHandler());

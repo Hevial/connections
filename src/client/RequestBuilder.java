@@ -43,6 +43,8 @@ public class RequestBuilder {
     public Request buildRegisterRequest() {
         menu.setCurrAction(MenuAction.REGISTER.getDisplayName());
         AuthRequest user = menu.requestCredentials("Username: ", "Password: ");
+        if (user == null)
+            return null;
         JsonElement data = gson.toJsonTree(user, AuthRequest.class);
         return new Request(Action.REGISTER, data);
     }
@@ -55,6 +57,8 @@ public class RequestBuilder {
     public Request buildLoginRequest() {
         menu.setCurrAction(MenuAction.LOGIN.getDisplayName());
         AuthRequest user = menu.requestCredentials("Username: ", "Password: ");
+        if (user == null)
+            return null;
         JsonElement data = gson.toJsonTree(user, AuthRequest.class);
         return new Request(Action.LOGIN, data);
     }
@@ -81,7 +85,11 @@ public class RequestBuilder {
     public Request buildUpdateCredentialsRequest() {
         menu.setCurrAction(MenuAction.UPDATE_CREDENTIALS.getDisplayName());
         AuthRequest oldUser = menu.requestCredentials("Vecchio Username: ", "Vecchia Password: ");
+        if (oldUser == null)
+            return null;
         AuthRequest newUser = menu.requestCredentials("Nuovo Username: ", "Nuova Password: ");
+        if (newUser == null)
+            return null;
 
         if (newUser.getUsername().isBlank() && !newUser.getPassword().isBlank()) {
             newUser.setUsername(oldUser.getUsername());
@@ -116,6 +124,8 @@ public class RequestBuilder {
         int gameId = -1;
         if (!currentGame) {
             gameId = menu.getGameId();
+            if (gameId == Integer.MIN_VALUE)
+                return null;
         }
         JsonElement data = gson.toJsonTree(Map.of("gameId", gameId));
         return new Request(Action.GAME_STATUS, data);
@@ -148,12 +158,16 @@ public class RequestBuilder {
 
     public Request buildGameStatsRequest() {
         int gameId = menu.getGameId();
+        if (gameId == Integer.MIN_VALUE)
+            return null;
         JsonElement reqData = gson.toJsonTree(Map.of("gameId", gameId));
         return new Request(Action.GAME_STATS, reqData);
     }
 
     public Request buildLeaderboardRequest() {
         LeaderboardReq lbReq = menu.getLeaderboardRequest();
+        if (lbReq == null)
+            return null;
         JsonElement reqData = gson.toJsonTree(lbReq);
         return new Request(Action.LEADERBOARD, reqData);
     }
@@ -166,6 +180,8 @@ public class RequestBuilder {
         menu.setCurrAction(MenuAction.MAKE_PROPOSAL.getDisplayName());
         menu.showGameData();
         List<String> proposal = menu.getWordsForProposal();
+        if (proposal == null)
+            return null;
         JsonElement data = gson.toJsonTree(Map.of("proposalWords", proposal));
         return new Request(Action.SUBMIT_PROPOSAL, data);
     }

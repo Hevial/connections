@@ -1,19 +1,15 @@
 package client.handlers;
 
-import java.util.Scanner;
-
 import com.google.gson.JsonElement;
 
+import client.ClientMain;
 import client.menus.BaseMenu;
 import client.menus.MainMenu;
 import models.enums.StatusCodes;
 
 public class LogoutResponseHandler implements ResponseActionHandler {
 
-    private final Scanner scanner;
-
-    public LogoutResponseHandler(Scanner scanner) {
-        this.scanner = scanner;
+    public LogoutResponseHandler() {
     }
 
     @Override
@@ -21,7 +17,12 @@ public class LogoutResponseHandler implements ResponseActionHandler {
         String msg = statusCode.toString() + " (" + statusCode.getCode() + "), " + message;
 
         if (statusCode == StatusCodes.SUCCESS) {
-            BaseMenu newMenu = new MainMenu(scanner);
+            // stop keepalive when logging out
+            try {
+                ClientMain.stopNotificationKeepalive();
+            } catch (Exception ignored) {
+            }
+            BaseMenu newMenu = new MainMenu();
             newMenu.setLastMessage(msg);
             newMenu.setCurrAction(null);
             return newMenu;
