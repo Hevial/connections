@@ -153,6 +153,8 @@ public class GameManager implements Runnable {
                 currentGameState.getGame().getGroups());
         try {
             dbManager.saveGameHistory(completedGame);
+            // TODO notify clients about game end
+            NotificationSender.notifyGameEnd(completedGame);
         } catch (Exception e) {
             System.out.println("Failed to save game history: " + e.getMessage());
         }

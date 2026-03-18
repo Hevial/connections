@@ -136,6 +136,30 @@ public class DBManager {
     }
 
     /**
+     * Returns whether the user with the given userId is currently logged in.
+     *
+     * @param userId the user id to check
+     * @return true if logged in, false otherwise
+     */
+    public boolean isUserLoggedIn(String userId) {
+        if (userId == null || userId.isBlank()) {
+            return false;
+        }
+        return loggedInUsers.contains(userId);
+    }
+
+    /**
+     * Returns whether the user with the given username is currently logged in.
+     *
+     * @param username the username to check
+     * @return true if logged in, false otherwise
+     */
+    public boolean isUserLoggedInByUsername(String username) {
+        User u = getUserByUsername(username);
+        return u != null && isUserLoggedIn(u.getUserId());
+    }
+
+    /**
      * Adds a new user to the system.
      *
      * @param user the {@link User} object to be added

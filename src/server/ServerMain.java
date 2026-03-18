@@ -36,6 +36,10 @@ public class ServerMain {
             gameExecutorService.scheduleWithFixedDelay(gameManager, 0,
                     config.getGameDuration(), TimeUnit.SECONDS);
 
+            // Start UDP listener to accept client pokes on the configured port
+            ExecutorService udpExecutor = Executors.newSingleThreadExecutor();
+            udpExecutor.execute(new NotificationListener(config.getPort()));
+
             while (true) {
                 // Wait for a client to connect
                 SocketChannel clientSocket = serverSocket.accept();

@@ -68,20 +68,22 @@ public class ServerWorker implements Runnable {
             // If the session has a logged-in user, log them out
             if (session.isAuthenticated()) {
                 DBManager.getInstance().logoutUser(session.getUserId());
-            }
+                // ensure notification registry cleaned up
+                NotificationRegistry.unregister(session.getUserId());
 
-            try {
-                if (clientSocket != null && clientSocket.isOpen()) {
-                    clientSocket.close();
-                }
-                if (clientIp != null) {
-                    System.out.println("Client disconnected: " + clientIp);
-                }
+                try {
+                    if (clientSocket != null && clientSocket.isOpen()) {
+                        clientSocket.close();
+                    }
+                    if (clientIp != null) {
+                        System.out.println("Client disconnected: " + clientIp);
+                    }
 
-            } catch (Exception e) {
-                e.printStackTrace();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
         }
-    }
 
+    }
 }
