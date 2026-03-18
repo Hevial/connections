@@ -46,7 +46,6 @@ public class LeaderboardFormatter {
                     + SCORE_WIDTH + "s │ %" + WINRATE_WIDTH + "s  ║%n",
                     "-", emptyMessage, "-", "-"));
         } else {
-            int rank = 1;
             for (LeaderboardEntry entry : entries) {
                 String trimmedUsername = entry.getUsername().length() > USERNAME_WIDTH
                         ? entry.getUsername().substring(0, USERNAME_WIDTH - 3) + "..."
@@ -54,11 +53,10 @@ public class LeaderboardFormatter {
 
                 sb.append(String.format("║ %-" + RANK_WIDTH + "d │ %-" + USERNAME_WIDTH + "s │ %"
                         + SCORE_WIDTH + "d │ %" + WINRATE_WIDTH + ".2f%% ║%n",
-                        rank,
+                        entry.getRank(),
                         trimmedUsername,
                         entry.getScore(),
                         entry.getWinRate() * 100));
-                rank++;
             }
         }
 
