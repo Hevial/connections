@@ -107,7 +107,7 @@ public class PlayerGameState {
      * @return an immutable list of groups found by the player
      */
     public List<Group> getGroupsFound() {
-        return List.copyOf(groupsFound);
+        return groupsFound == null ? List.of() : List.copyOf(groupsFound);
     }
 
     /**
@@ -157,7 +157,7 @@ public class PlayerGameState {
     }
 
     public List<String> getWordsLeft() {
-        return List.copyOf(wordsLeft);
+        return wordsLeft == null ? List.of() : List.copyOf(wordsLeft);
     }
 
     public String getTimeLeft() {
