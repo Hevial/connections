@@ -146,29 +146,6 @@ public class GameManager implements Runnable {
         });
     }
 
-    // private void saveInGameHistory() {
-
-    // DBManager dbManager = DBManager.getInstance();
-    // CompletedGame completedGame = new CompletedGame(currentGameState.getGameId(),
-    // playerStatesByUserId,
-    // currentGameState.getGame().getGroups());
-    // try {
-    // dbManager.saveGameHistory(completedGame);
-    // } catch (Exception e) {
-    // System.out.println("Failed to save game history: " + e.getMessage());
-    // }
-
-    // }
-
-    // private void updatePlayersStats() {
-    // DBManager dbManager = DBManager.getInstance();
-    // try {
-    // dbManager.updateUsersStats(playerStatesByUserId);
-    // } catch (Exception e) {
-    // System.out.println("Failed to update users stats: " + e.getMessage());
-    // }
-    // }
-
     @Override
     public void run() {
 
@@ -206,9 +183,6 @@ public class GameManager implements Runnable {
                     System.out.println("Failed to send game-end notifications: " + e.getMessage());
                 }
             }
-
-            // TODO CHECK IF CLEARING PLAYER STATES BEFORE OR AFTER LOADING THE NEW GAME IS
-            // BETTER
             System.out.println("\nNew game started: ");
             currentGameState.printGameState();
         } catch (Exception e) {
