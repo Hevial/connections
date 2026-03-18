@@ -93,8 +93,9 @@ public class NotificationClient implements AutoCloseable, Runnable {
     }
 
     /**
-     * Start periodic keepalive pokes. The same value/token will be sent every
-     * intervalSecs.
+     * Start periodic keepalive pokes. The same username payload will be sent
+     * at a fixed interval to keep the client's NAT mapping active on the
+     * server side.
      */
     public void startKeepalive(String usename, long intervalSecs) {
         stopKeepalive();

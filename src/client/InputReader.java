@@ -17,6 +17,11 @@ public final class InputReader {
     private InputReader() {
     }
 
+    /**
+     * Starts the background reader thread if not already running. The reader
+     * continuously reads lines from System.in and enqueues them for consumption
+     * by the application.
+     */
     public static void start() {
         if (running)
             return;
@@ -44,6 +49,13 @@ public final class InputReader {
         t.start();
     }
 
+    /**
+     * Polls for a completed input line from the background reader.
+     *
+     * @param timeoutMillis maximum time to wait in milliseconds
+     * @return a trimmed input line or {@code null} if the timeout expired or
+     *         the thread was interrupted
+     */
     public static String pollLine(long timeoutMillis) {
         try {
             return QUEUE.poll(timeoutMillis, TimeUnit.MILLISECONDS);
@@ -53,6 +65,9 @@ public final class InputReader {
         }
     }
 
+    /**
+     * Clears any queued lines that have not yet been consumed.
+     */
     public static void clearQueue() {
         QUEUE.clear();
     }
@@ -60,4 +75,5 @@ public final class InputReader {
     public static void stop() {
         running = false;
     }
+
 }

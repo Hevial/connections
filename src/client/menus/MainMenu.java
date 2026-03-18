@@ -7,6 +7,15 @@ import java.util.function.Supplier;
 
 import models.Request;
 
+/**
+ * Main entry menu shown to unauthenticated users.
+ *
+ * <p>
+ * Provides options to login, register, update credentials or exit the
+ * application. Subclasses of {@link BaseMenu} implement the concrete
+ * request builders used by the menu actions.
+ * </p>
+ */
 public class MainMenu extends BaseMenu {
 
     private final Map<Integer, Supplier<Request>> requestBuilders;

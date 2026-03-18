@@ -156,6 +156,12 @@ public class RequestBuilder {
         return buildGameStatusRequest(false);
     }
 
+    /**
+     * Build a request to fetch statistics for a specific game id.
+     *
+     * @return a {@link Request} with action {@link Action#GAME_STATS} or null
+     *         if user input was cancelled
+     */
     public Request buildGameStatsRequest() {
         int gameId = menu.getGameId();
         if (gameId == Integer.MIN_VALUE)
@@ -163,6 +169,13 @@ public class RequestBuilder {
         JsonElement reqData = gson.toJsonTree(Map.of("gameId", gameId));
         return new Request(Action.GAME_STATS, reqData);
     }
+
+    /**
+     * Build a request to retrieve leaderboard information based on
+     * {@link LeaderboardReq} returned by the menu.
+     *
+     * @return a {@link Request} with action {@link Action#LEADERBOARD}
+     */
 
     public Request buildLeaderboardRequest() {
         LeaderboardReq lbReq = menu.getLeaderboardRequest();
@@ -172,10 +185,22 @@ public class RequestBuilder {
         return new Request(Action.LEADERBOARD, reqData);
     }
 
+    /**
+     * Build a request to retrieve statistics for the currently authenticated
+     * user.
+     *
+     * @return a {@link Request} with action {@link Action#PERSONAL_STATS}
+     */
     public Request buildPersonalStatsRequest() {
         return new Request(Action.PERSONAL_STATS, null);
     }
 
+    /**
+     * Build a submit-proposal request using the words collected from the menu.
+     *
+     * @return a {@link Request} with action {@link Action#SUBMIT_PROPOSAL} or
+     *         null if input was cancelled
+     */
     public Request buildMakeProposalRequest() {
         menu.setCurrAction(MenuAction.MAKE_PROPOSAL.getDisplayName());
         menu.showGameData();

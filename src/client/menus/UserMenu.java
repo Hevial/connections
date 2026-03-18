@@ -11,6 +11,14 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Menu presented to authenticated users.
+ *
+ * <p>
+ * Exposes gameplay actions (make proposal, view game status, request
+ * statistics, leaderboard, update credentials and logout).
+ * </p>
+ */
 public class UserMenu extends BaseMenu {
     private final Map<Integer, Supplier<Request>> requestBuilders;
 
