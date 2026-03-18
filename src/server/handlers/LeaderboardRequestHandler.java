@@ -27,6 +27,13 @@ public class LeaderboardRequestHandler implements RequestActionHandler {
     public Response handle(JsonElement data, Session session) {
         Gson gson = new Gson();
         LeaderboardReq lbReq = gson.fromJson(data, LeaderboardReq.class);
+
+        if (lbReq == null) {
+            // Malformed or missing payload: return BAD_REQUEST to client
+            return new Response(Action.LEADERBOARD, StatusCodes.BAD_REQUEST,
+                    "Invalid or missing leaderboard request payload", null);
+        }
+
         DBManager dbManager = DBManager.getInstance();
         Map<String, UserStats> allStats = dbManager.getAllUsersStats();
 
