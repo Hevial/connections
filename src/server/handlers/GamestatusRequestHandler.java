@@ -15,6 +15,16 @@ import server.GameManager;
 import server.Session;
 import server.db.DBManager;
 
+/**
+ * Handler for {@code GAME_STATUS} requests.
+ *
+ * <p>Accepts a JSON payload containing a {@code gameId}. If the requested id
+ * corresponds to the currently active round (or {@code -1} is supplied), the
+ * handler returns the live {@link PlayerGameState} for the requesting session.
+ * Otherwise, it attempts to load the completed game with the requested id and
+ * returns a {@link PlayerCompletedGame} view containing per-player statistics
+ * for the requester.</p>
+ */
 public class GamestatusRequestHandler implements RequestActionHandler {
 
     private final GameManager gameManager;
@@ -43,11 +53,6 @@ public class GamestatusRequestHandler implements RequestActionHandler {
                     return new Response(Action.GAME_STATUS, StatusCodes.NOT_FOUND,
                             "Completed game with ID " + requestedGameId + " not found", null);
                 }
-
-                // if (!completedGame.isPlayerPresent(session.getUserId())) {
-                // return new Response(Action.GAME_STATUS, StatusCodes.FORBIDDEN,
-                // "Non hai partecipato a questa partita", null);
-                // }
 
                 PlayerCompletedGame playerCompletedGame = new PlayerCompletedGame(
                         completedGame.getGameId(),

@@ -30,10 +30,20 @@ public class NotificationListener implements Runnable {
     private final int port;
     private volatile boolean running = true;
 
+    /**
+     * Create a notification listener that binds to the specified UDP port.
+     *
+     * @param port UDP port on which to listen for client pokes
+     */
     public NotificationListener(int port) {
         this.port = port;
     }
 
+    /**
+     * Request an orderly shutdown of the listener loop. The {@link #run()}
+     * method will observe the flag and exit shortly after the next receive
+     * attempt returns.
+     */
     public void stop() {
         running = false;
     }

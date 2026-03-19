@@ -28,9 +28,30 @@ public class ClientMain {
     private static ResponseHandler responseHandler = new ResponseHandler();
 
     // UDP notification handling
+    /**
+     * Local UDP port used by the {@link NotificationClient} listener. Set to
+     * {@code -1} when the listener is not running.
+     */
     private static int notifyPort = -1;
+
+    /**
+     * Flag indicating whether a notification message is pending consumption by
+     * the interactive UI.
+     */
     private static volatile boolean notificationPending = false;
+
+    /**
+     * The currently pending notification message (consumed by
+     * {@link #consumeNotification()}). May be {@code null} when no message is
+     * pending.
+     */
     private static volatile String notificationMessage = null;
+
+    /**
+     * Helper that manages UDP notification listening and poke/keepalive
+     * operations. Null when notifications are not configured or the listener
+     * failed to start.
+     */
     private static NotificationClient notificationClient = null;
 
     /**
@@ -159,6 +180,32 @@ public class ClientMain {
         notificationClient.stopKeepalive();
     }
 
+    /**
+     * Initialize client subsystems and run the main request/response loop.
+     *
+     * <p>
+     * This method performs the following steps:
+     * <ol>
+     * <li>Starts the {@link NotificationClient} (if available) and records
+     * its local UDP port.</li>
+     * <li>Starts the non-blocking {@link InputReader} so the UI can be
+     * interrupted by notifications.</li>
+     * <li>Opens a TCP {@link SocketChannel} to the server and runs a loop
+     * that renders the current menu, collects the user's choice, sends
+     * the serialized {@link models.Request}, receives the server
+     * {@link models.Response} and delegates handling to
+     * {@link ResponseHandler}.</li>
+     * </ol>
+     * </p>
+     *
+     * <p>
+     * IO and network exceptions are propagated to the caller of
+     * {@link #main(String[])}, which prints the stack trace. This method is
+     * intentionally kept package-private to be invoked only from this class.
+     * </p>
+     *
+     * @param config the client configuration with server hostname and port
+     */
     private static void startClient(ClientConfig config) {
         System.out.println("Client will connect to " + config.getServerHostname() + ":" + config.getServerPort());
 

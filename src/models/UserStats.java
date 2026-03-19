@@ -23,9 +23,7 @@ public class UserStats {
     private int maxStreak;
     private int perfectPuzzles;
     private int score;
-    private MistakeHistogram mistakeHistogram; // Index 0: 1 mistake, Index 1: 2 mistakes, ..., Index 3: 4 mistakes,
-                                               // Index
-                                               // 4: not finished
+    private MistakeHistogram mistakeHistogram;
 
     public UserStats(int puzzlesCompleted, int currentStreak,
             int maxStreak, int perfectPuzzles, int score, MistakeHistogram mistakeHistogram) {

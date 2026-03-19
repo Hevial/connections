@@ -5,6 +5,23 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+/**
+ * Mutable runtime representation of a single player's state within an active
+ * game session.
+ *
+ * <p>
+ * This class tracks the player's progress, including mistakes, score,
+ * found groups, remaining words, and whether the player has completed or won
+ * the game. It exposes methods to update state when the player submits a
+ * proposal and to query validity and membership of proposed words.
+ * </p>
+ *
+ * <p>
+ * Instances are intended to be used by a single-threaded game loop or
+ * by well-synchronized server code; no internal synchronization is
+ * provided.
+ * </p>
+ */
 public class PlayerGameState {
 
     private static final int POINTS_PER_SUCCESS = 6;
@@ -48,18 +65,41 @@ public class PlayerGameState {
         return mistakes;
     }
 
+    /**
+     * Returns the current score for the player in this game.
+     *
+     * @return the player's score (may be negative if penalties were applied)
+     */
     public int getScore() {
         return score;
     }
 
+    /**
+     * Indicates whether the player has completed the game as a winner.
+     *
+     * @return {@code true} if the player won the game; {@code false} otherwise
+     */
     public boolean isWinner() {
         return isWinner;
     }
 
+    /**
+     * Indicates whether the player's game session is finished
+     * (either by winning or losing, otherwise is not completed).
+     *
+     * @return {@code true} when the player's session is complete; {@code false}
+     *         when it is still active
+     */
     public boolean isCompleted() {
         return isCompleted;
     }
 
+    /**
+     * Marks the player's session as complete or incomplete.
+     *
+     * @param isCompleted {@code true} to mark the session complete; {@code
+     *                    false} to mark it active
+     */
     public void setComplete(boolean isCompleted) {
         this.isCompleted = isCompleted;
     }
@@ -156,18 +196,38 @@ public class PlayerGameState {
         }
     }
 
+    /**
+     * Returns a read-only view of the words that the player has not yet found.
+     *
+     * @return an immutable list of remaining words for this player
+     */
     public List<String> getWordsLeft() {
         return wordsLeft == null ? List.of() : List.copyOf(wordsLeft);
     }
 
+    /**
+     * Returns the human-readable remaining time for the player's session.
+     *
+     * @return the remaining time string as produced by the game loop
+     */
     public String getTimeLeft() {
         return timeLeft;
     }
 
+    /**
+     * Sets the human-readable remaining time for the player's session.
+     *
+     * @param timeLeft formatted remaining time (display string)
+     */
     public void setTimeLeft(String timeLeft) {
         this.timeLeft = timeLeft;
     }
 
+    /**
+     * Returns the identifier of the game this player state belongs to.
+     *
+     * @return the game id
+     */
     public int getGameId() {
         return gameId;
     }
@@ -207,10 +267,23 @@ public class PlayerGameState {
         return allWords.containsAll(words);
     }
 
+    /**
+     * Indicates whether the player has lost the game (reached the mistake
+     * threshold).
+     *
+     * @return {@code true} if the player is a loser; {@code false} otherwise
+     */
     public boolean isLoser() {
         return isLoser;
     }
 
+    /**
+     * Manually sets the loser flag for the player. Normally the
+     * flag is managed by {@link #incrementMistakes()}.
+     *
+     * @param isLoser {@code true} to mark the player as loser; {@code false}
+     *                otherwise
+     */
     public void setLoser(boolean isLoser) {
         this.isLoser = isLoser;
     }

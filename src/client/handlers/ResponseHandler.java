@@ -10,6 +10,33 @@ import models.Response;
 import models.enums.Action;
 import models.enums.StatusCodes;
 
+/**
+ * Central dispatcher that routes server {@link models.Response} objects to the
+ * corresponding {@link ResponseActionHandler} based on
+ * {@link models.enums.Action}.
+ *
+ * <p>
+ * This class maintains an internal {@link java.util.EnumMap} of action handlers
+ * and provides a single entry point {@link #handleResponse(Response, BaseMenu)}
+ * to preprocess responses (e.g. refresh the current username) and delegate
+ * actual response processing to the appropriate handler.
+ * </p>
+ *
+ * <p>
+ * Side effects: handlers and this dispatcher may modify the provided
+ * {@code currentMenu} (for example updating the username or last message) and
+ * will write error information to standard error on unexpected conditions.
+ * </p>
+ *
+ * <p>
+ * Threading: this class is not explicitly thread-safe and is intended to be
+ * called from the client UI or a single client thread.
+ * </p>
+ *
+ * @see ResponseActionHandler
+ * @see models.Response
+ * @see models.enums.Action
+ */
 public class ResponseHandler {
 
     private final Map<Action, ResponseActionHandler> actionHandlers;
@@ -28,14 +55,28 @@ public class ResponseHandler {
     }
 
     /**
-     * Central dispatcher that routes a server {@link Response} to the
-     * corresponding {@link ResponseActionHandler} based on the
-     * {@link models.enums.Action}.
+     * Handle and dispatch a server response to the appropriate action handler.
      *
-     * @param response    the server response to process (may be null)
+     * <p>
+     * Preprocessing performed by this method includes updating the
+     * {@code currentMenu}'s username using the response's session username when
+     * present, and appending a warning to the message if the username was
+     * changed by another client. If the {@code response} is {@code null}, an
+     * error message is set on the menu and the same {@code currentMenu} is
+     * returned.
+     * </p>
+     *
+     * <p>
+     * After preprocessing, the method looks up the handler registered for the
+     * response's action and delegates processing. If no handler is found, an
+     * error is logged, the menu's current action is cleared, and
+     * {@code currentMenu} is returned unchanged.
+     * </p>
+     *
+     * @param response    the server response to process; may be {@code null}
      * @param currentMenu the current UI menu instance that may be updated by
      *                    handlers
-     * @return the next {@link BaseMenu} to display (may be the same instance)
+     * @return the next {@link BaseMenu} to display; may be the same instance
      */
     public BaseMenu handleResponse(Response response, BaseMenu currentMenu) {
         if (response == null) {

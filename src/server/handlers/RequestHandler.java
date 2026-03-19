@@ -14,6 +14,15 @@ import server.GameManager;
 import server.Session;
 import server.db.DBManager;
 
+/**
+ * Central dispatcher that maps {@link models.enums.Action} values to their
+ * corresponding {@link RequestActionHandler} implementations.
+ *
+ * <p>This class encapsulates the registration of all action handlers and
+ * provides a single entry point {@link #handleRequest(Request, Session)} to
+ * process incoming requests: it resolves the appropriate handler and delegates
+ * execution, performing light session reconciliation before dispatch.</p>
+ */
 public class RequestHandler {
     private final Map<Action, RequestActionHandler> actionHandlers;
 
@@ -30,6 +39,17 @@ public class RequestHandler {
         actionHandlers.put(Action.LEADERBOARD, new LeaderboardRequestHandler());
     }
 
+    /**
+     * Handle an incoming request by delegating to the registered action handler.
+     *
+     * <p>The method performs light session reconciliation: if the session has a
+     * {@code userId} it attempts to refresh the username from the database and
+     * clears the session if the user is no longer present.</p>
+     *
+     * @param request incoming {@link Request} to handle
+     * @param session the {@link Session} representing the connected client
+     * @return a {@link Response} produced by the corresponding action handler
+     */
     public Response handleRequest(Request request, Session session) {
 
         if (session.getUserId() != null) {

@@ -21,6 +21,14 @@ import models.enums.StatusCodes;
 import server.Session;
 import server.db.DBManager;
 
+/**
+ * Handler for {@code LEADERBOARD} requests.
+ *
+ * <p>Processes {@link models.LeaderboardReq} payloads and builds a list of
+ * {@link models.LeaderboardEntry} results. Supports full leaderboard,
+ * top-K selection and querying a single player's entry. Results are sorted
+ * by score descending and include rank, username, win rate and score.</p>
+ */
 public class LeaderboardRequestHandler implements RequestActionHandler {
 
     @Override

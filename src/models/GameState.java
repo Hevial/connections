@@ -10,7 +10,15 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * Represents the runtime state of a game session.
+ * Represents the runtime state of a single game session.
+ *
+ * <p>This snapshot pairs a {@link Game} with timing information and
+ * convenience accessors used by server and client code to present and
+ * manage an active game. It provides formatted timestamps, a shuffled word
+ * list generator for player sessions and helpers to compute remaining time.</p>
+ *
+ * <p>Time values: {@code createdAt} is epoch milliseconds; {@code
+ * gameDuration} is measured in seconds.</p>
  */
 public class GameState {
 
@@ -72,7 +80,8 @@ public class GameState {
     /**
      * Returns the remaining game time formatted as hours, minutes, and seconds.
      *
-     * @return the remaining time in the format 00h:00m:00s
+     * @return the remaining time in the format {@code HH:mm:ss}; returns
+     *         {@code 00:00:00} when the time has elapsed
      */
     public String getRemainingTime() {
         long elapsedTime = System.currentTimeMillis() - createdAt;
@@ -80,7 +89,12 @@ public class GameState {
 
         return LocalTime.ofSecondOfDay(remainingTime).format(REMAINING_TIME_FORMATTER);
     }
-
+    /**
+     * Returns the creation timestamp formatted for display.
+     *
+     * @return a human-readable timestamp for {@code createdAt} using the
+     *         pattern {@code dd/MM/yyyy HH:mm:ss}
+     */
     public String getCreatedAtTime() {
         return Instant.ofEpochMilli(createdAt)
                 .atZone(ZoneId.systemDefault())

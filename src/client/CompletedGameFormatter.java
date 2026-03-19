@@ -8,11 +8,18 @@ import models.PlayerCompletedGame;
 import models.PlayerGameStats;
 
 /**
- * Renders {@link CompletedGame} into a CLI-friendly board layout.
- * <p>
- * Uses the same visual style as PlayerGameStateFormatter: framed box,
- * centered titles and 4-column grids for group words.
- * </p>
+ * Utility class to render {@link CompletedGame} instances as plain-text
+ *, terminal-friendly boards and summaries.
+ *
+ * <p>Output is formatted using box-drawing characters and fixed-width cells
+ * to produce a compact, human-readable representation suitable for CLI
+ * display. The formatter produces full game boards, per-user views and
+ * compact summaries.</p>
+ *
+ * <p>Formatting constants (column count, cell width and content width) are
+ * tuned for an 80-column terminal but can be adjusted if necessary.</p>
+ *
+ * @see models.CompletedGame
  */
 public final class CompletedGameFormatter {
 
@@ -27,8 +34,13 @@ public final class CompletedGameFormatter {
     /**
      * Formats the provided completed game into a textual summary board.
      *
-     * @param game completed game to render
-     * @return formatted multiline board string
+        * <p>The returned string contains a framed board with game metadata,
+        * winners and groups laid out in a 4-column grid. The content may
+        * include internationalized strings as provided by the {@link CompletedGame}
+        * model.</p>
+        *
+        * @param game completed game to render; must not be {@code null}
+        * @return formatted multi-line board string suitable for console output
      */
     public static String format(CompletedGame game) {
         StringBuilder sb = new StringBuilder();
@@ -58,6 +70,18 @@ public final class CompletedGameFormatter {
         return sb.toString();
     }
 
+    
+    /**
+     * Formats a per-user view of a completed game.
+     *
+     * <p>This view contains the user's statistics (if present) and the
+     * solution groups. When the {@link PlayerCompletedGame#getPlayerStats()}
+     * is {@code null} the user did not participate and a suitable message is
+     * shown.</p>
+     *
+     * @param game the player-specific completed game view; must not be {@code null}
+     * @return formatted multi-line string for the specified player
+     */
     public static String formatForUser(PlayerCompletedGame game) {
         StringBuilder sb = new StringBuilder();
 
@@ -102,9 +126,8 @@ public final class CompletedGameFormatter {
      * printing to a terminal.
      * </p>
      *
-     * @param game the {@link CompletedGame} instance to summarize; must not be
-     *             {@code null}
-     * @return a multi-line {@link String} containing the formatted summary
+    * @param game the {@link CompletedGame} instance to summarize; must not be {@code null}
+    * @return a multi-line {@link String} containing the formatted summary
      */
     public static String formatSummary(CompletedGame game) {
         StringBuilder sb = new StringBuilder();
@@ -120,6 +143,9 @@ public final class CompletedGameFormatter {
 
     /**
      * Appends the provided words as a 4-column grid.
+     *
+     * @param sb destination string builder
+     * @param words list of words to format (may be empty)
      */
     private static void appendWordsGrid(StringBuilder sb, List<String> words) {
         for (int index = 0; index < words.size(); index += BOARD_COLUMNS) {
@@ -139,6 +165,9 @@ public final class CompletedGameFormatter {
 
     /**
      * Appends a left-aligned content line inside the board frame.
+     *
+     * @param sb destination builder
+     * @param content text to place in the line
      */
     private static void appendLine(StringBuilder sb, String content) {
         sb.append("║ ")
@@ -148,6 +177,9 @@ public final class CompletedGameFormatter {
 
     /**
      * Appends a centered content line inside the board frame.
+     *
+     * @param sb destination builder
+     * @param content text to center
      */
     private static void appendCenteredLine(StringBuilder sb, String content) {
         sb.append("║ ")
@@ -157,6 +189,11 @@ public final class CompletedGameFormatter {
 
     /**
      * Appends a horizontal border line with custom edge and fill characters.
+     *
+     * @param sb destination builder
+     * @param left left edge character
+     * @param fill fill character repeated across the content width
+     * @param right right edge character
      */
     private static void appendBorder(StringBuilder sb, char left, char fill, char right) {
         sb.append(left)
@@ -167,6 +204,10 @@ public final class CompletedGameFormatter {
 
     /**
      * Centers text in a fixed-width cell.
+     *
+     * @param text the text to center
+     * @param width the target cell width
+     * @return a string of length {@code width} with {@code text} centered
      */
     private static String center(String text, int width) {
         if (text.length() >= width) {
@@ -181,6 +222,10 @@ public final class CompletedGameFormatter {
 
     /**
      * Pads text with spaces on the right up to the target width.
+     *
+     * @param text text to pad
+     * @param width target width
+     * @return padded string
      */
     private static String padRight(String text, int width) {
         if (text.length() >= width) {
@@ -191,6 +236,10 @@ public final class CompletedGameFormatter {
 
     /**
      * Trims text to fit the target width, using ellipsis when needed.
+     *
+     * @param text input text
+     * @param width maximum allowed width
+     * @return possibly trimmed text
      */
     private static String trimToWidth(String text, int width) {
         if (text.length() <= width) {

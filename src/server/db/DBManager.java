@@ -65,11 +65,7 @@ import models.UserStats;
  *
  */
 
-// TODO: Refactor to separete responsibilities user management and game data
-// management into different classes if needed.
-// (Maybe)
 public class DBManager {
-
     private static DBManager instance;
     private DBConfig config;
     private ConcurrentHashMap<String, User> usersCache; // key: userId, value: User
@@ -128,6 +124,18 @@ public class DBManager {
         return usersCache.get(userId);
     }
 
+    /**
+     * Retrieves a user from the cache by their unique identifier.
+     *
+     * <p>This method performs a null/blank check on the provided {@code userId}
+     * and returns the cached {@link User} if present. It does not perform any
+     * I/O and returns {@code null} when the input is invalid or the user is not
+     * found.</p>
+     *
+     * @param userId the unique identifier of the user to retrieve
+     * @return the {@link User} associated with {@code userId}, or {@code null}
+     *         if {@code userId} is null/blank or no user is present in the cache
+     */
     public User getUserById(String userId) {
         if (userId == null || userId.isBlank()) {
             return null;
@@ -218,6 +226,21 @@ public class DBManager {
         return loggedInUsers.remove(userId);
     }
 
+    /**
+     * Updates a user's credentials (username and password).
+     *
+     * <p>
+     * The operation verifies the existing username and password, ensures
+     * the requested new username is not already taken (unless unchanged),
+     * updates the in-memory user, and persists the change to disk.
+     * </p>
+     *
+     * @param oldUsername the current username of the account
+     * @param oldPassword the current password for the account
+     * @param newUsername the desired new username
+     * @param newPassword the desired new password
+     * @return a {@link DBStatus} describing the result of the operation
+     */
     public synchronized DBStatus updateCredentials(String oldUsername, String oldPassword, String newUsername,
             String newPassword) {
         User user = getUserByUsername(oldUsername);
@@ -589,6 +612,20 @@ public class DBManager {
         }
     }
 
+    /**
+     * Reads and returns the complete users statistics map from the configured
+     * statistics JSON file.
+     *
+     * <p>
+     * If the file does not exist it is created and an empty map is
+     * returned. Any read/parsing errors produce a warning and an empty map is
+     * returned to callers.
+     * </p>
+     *
+     * @return a {@code Map<String, UserStats>} containing statistics for all
+     *         users; or an empty map if the file is missing, empty, or cannot be
+     *         read/parsed
+     */
     synchronized public Map<String, UserStats> getAllUsersStats() {
         String statsPath = config.getUsersStatsPath();
 

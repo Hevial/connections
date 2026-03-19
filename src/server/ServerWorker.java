@@ -23,12 +23,24 @@ public class ServerWorker implements Runnable {
     private final SocketChannel clientSocket;
     private Session session;
 
+    /**
+     * Create a new worker that will handle requests on the given client socket.
+     *
+     * @param requestHandler handler used to dispatch incoming requests
+     * @param clientSocket   connected {@link SocketChannel} for the client
+     */
     public ServerWorker(RequestHandler requestHandler, SocketChannel clientSocket) {
         this.requestHandler = requestHandler;
         this.clientSocket = clientSocket;
         this.session = new Session(null, null); // Initialize session with no user
     }
 
+    /**
+     * Main connection loop: read JSON requests from the client socket,
+     * dispatch them to the {@link RequestHandler}, and write JSON responses
+     * back to the socket. The method terminates when the connection is
+     * closed or an unrecoverable error occurs.
+     */
     @Override
     public void run() {
         String clientIp = null;

@@ -18,9 +18,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * Sends UDP notifications to registered clients.
- */
-/**
  * Utility for sending UDP notifications to registered clients.
  *
  * <p>

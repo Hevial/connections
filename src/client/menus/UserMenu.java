@@ -15,13 +15,28 @@ import java.util.Map;
  * Menu presented to authenticated users.
  *
  * <p>
- * Exposes gameplay actions (make proposal, view game status, request
- * statistics, leaderboard, update credentials and logout).
+ * This menu exposes gameplay and account-related actions available to a
+ * logged-in user, including making proposals, viewing game status, requesting
+ * statistics, viewing the leaderboard, updating credentials and logging out.
+ * Concrete request builders are provided via {@link #getRequestBuilders()}.
  * </p>
+ *
+ * @see BaseMenu
  */
 public class UserMenu extends BaseMenu {
+    /**
+     * Map of menu option index to {@link Supplier} that produces the
+     * corresponding {@link models.Request} for that option.
+     */
     private final Map<Integer, Supplier<Request>> requestBuilders;
 
+    /**
+     * Construct the user menu and register request builders for each option.
+     *
+     * <p>
+     * Option {@code 0} performs a program exit.
+     * </p>
+     */
     public UserMenu() {
         super();
         this.requestBuilders = Map.of(
@@ -41,16 +56,33 @@ public class UserMenu extends BaseMenu {
         );
     }
 
+    /**
+     * Return the mapping of menu option indices to request builders.
+     *
+     * @return a map where keys are option numbers and values are suppliers
+     *         producing the corresponding {@link models.Request}
+     */
     @Override
     protected Map<Integer, Supplier<Request>> getRequestBuilders() {
         return requestBuilders;
     }
 
+    /**
+     * Return the menu title displayed in the header area.
+     *
+     * @return the menu title string
+     */
     @Override
     protected String getMenuTitle() {
         return "MENU UTENTE";
     }
 
+    /**
+     * Return a map of menu options where the key is the option number and the
+     * value is the label shown to the user.
+     *
+     * @return ordered map of option index to label
+     */
     @Override
     protected Map<Integer, String> getMenuOptions() {
         Map<Integer, String> options = new LinkedHashMap<>();
@@ -66,6 +98,19 @@ public class UserMenu extends BaseMenu {
         return options;
     }
 
+    /**
+     * Collect proposal words from the user.
+     *
+     * <p>
+     * Prompts the user to enter exactly four comma-separated words, normalizes
+     * them to upper case and validates that none are empty and all are unique.
+     * If input is interrupted by a notification or cancelled, this method
+     * returns {@code null}.
+     * </p>
+     *
+     * @return a list of four normalized words, or {@code null} if input was
+     *         interrupted
+     */
     @Override
     public List<String> getWordsForProposal() {
         resetScreen();
@@ -110,6 +155,18 @@ public class UserMenu extends BaseMenu {
         }
     }
 
+    /**
+     * Prompt the user to enter a game id.
+     *
+     * <p>
+     * Accepts {@code -1} to refer to the current game. If input is
+     * interrupted by a notification this method returns {@link Integer#MIN_VALUE}
+     * to signal the caller that the operation should be retried.
+     * </p>
+     *
+     * @return the selected game id, {@code -1} for current game, or
+     *         {@code Integer.MIN_VALUE} if input was interrupted
+     */
     @Override
     public int getGameId() {
         int gameId = -1;
@@ -142,6 +199,18 @@ public class UserMenu extends BaseMenu {
         return gameId;
     }
 
+    /**
+     * Interactively build and return a {@link models.LeaderboardReq}.
+     *
+     * <p>
+     * The method offers three flows: general leaderboard, top-K listing,
+     * and player position lookup. It validates user input and returns
+     * {@code null} if the input was interrupted by a notification.
+     * </p>
+     *
+     * @return a {@link models.LeaderboardReq} or {@code null} if input was
+     *         interrupted
+     */
     @Override
     public LeaderboardReq getLeaderboardRequest() {
         resetScreen();

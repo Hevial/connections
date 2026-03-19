@@ -2,7 +2,6 @@ package client.menus;
 
 import java.util.List;
 import java.util.Map;
-/* Scanner removed: InputReader handles System.in */
 import java.util.function.Supplier;
 
 import client.RequestBuilder;
@@ -11,34 +10,26 @@ import client.InputReader;
 import models.AuthRequest;
 import models.LeaderboardReq;
 import models.Request;
-import models.User;
 
 /**
- * BaseMenu is an abstract class that provides a foundation for implementing
- * menu-driven user interfaces in a client application. It manages user input,
- * screen clearing, and request building logic, delegating specific request
- * creation to subclasses via the {@link #getRequestBuilders()} method.
- * 
+ * Abstract base class for console menus used by the client application.
+ *
  * <p>
- * Key responsibilities:
- * <ul>
- * <li>Handles user input and menu selection.</li>
- * <li>Manages screen clearing and message display.</li>
- * <li>Provides utility methods for credential input and request handling.</li>
- * <li>Requires subclasses to define available request builders.</li>
- * </ul>
+ * This class provides common UI scaffolding (header, footer, dynamic
+ * information), input handling utilities, and a simple request-building
+ * mechanism. Concrete menus extend this class and supply the menu title,
+ * available options and factories for creating {@link models.Request}
+ * instances via {@link #getRequestBuilders()}.
  * </p>
- * 
+ *
  * <p>
- * Fields include references to the input scanner, user session data, and
- * the last message displayed. This class is intended to be extended by
- * concrete menu implementations.
+ * Implementations may modify the provided menu state (for example
+ * username or lastMessage) and are expected to be used from a single UI
+ * thread.
  * </p>
- * 
  */
 public abstract class BaseMenu {
 
-    // Input is handled centrally by InputReader; no Scanner stored here.
     protected final RequestBuilder requestBuilder;
 
     // Session and display state
@@ -50,54 +41,112 @@ public abstract class BaseMenu {
     protected boolean shouldShowGameData;
     protected boolean shouldShowGeneralData;
 
+    /**
+     * Create a new BaseMenu instance.
+     *
+     * Implementations that extend this class should call the super
+     * constructor to initialize the {@link RequestBuilder} helper.
+     */
     protected BaseMenu() {
         this.requestBuilder = new RequestBuilder(this);
     }
 
     /* Getters and Setters */
 
+    /**
+     * Set the last informational message to display on the menu.
+     *
+     * @param message the message to show; may be {@code null} to clear it
+     */
     public void setLastMessage(String message) {
         this.lastMessage = message;
     }
 
+    /**
+     * Set the username associated with the current session/menu.
+     *
+     * @param username the username to set; may be {@code null}
+     */
     public void setUsername(String username) {
         this.username = username;
     }
 
+    /**
+     * Get the username associated with the current session/menu.
+     *
+     * @return the username, or {@code null} if not set
+     */
     public String getUsername() {
         return username;
     }
 
+    /**
+     * Set the current action description displayed on the menu.
+     *
+     * @param action a short description of the current action; may be {@code null}
+     */
     public void setCurrAction(String action) {
         this.currAction = action;
     }
 
+    /**
+     * Set the textual game data to be displayed by the menu.
+     *
+     * @param gameData textual representation of game-related data; may be
+     *                 {@code null}
+     */
     public void setGameData(String gameData) {
         this.gameData = gameData;
     }
 
+    /**
+     * Set general (non-game) data to be displayed by the menu.
+     *
+     * @param generalData textual data to display; may be {@code null}
+     */
     public void setGeneralData(String generalData) {
         this.generalData = generalData;
     }
 
+    /**
+     * Mark stored game data to be shown on the next render.
+     */
     public void showGameData() {
         this.shouldShowGameData = true;
     }
 
+    /**
+     * Hide stored game data from the next render.
+     */
     public void hideGameData() {
         this.shouldShowGameData = false;
     }
 
+    /**
+     * Mark stored general data to be shown on the next render.
+     */
     public void showGeneralData() {
         this.shouldShowGeneralData = true;
     }
 
+    /**
+     * Hide stored general data from the next render.
+     */
     public void hideGeneralData() {
         this.shouldShowGeneralData = false;
     }
 
     /* Menu Interface Implementation */
 
+    /**
+     * Render the menu to the console.
+     *
+     * <p>
+     * This method performs a full redraw by clearing the screen and
+     * printing the header, title, custom content, options, footer and dynamic
+     * information in that order.
+     * </p>
+     */
     public final void show() {
         clearScreen();
         System.out.println();
@@ -110,6 +159,14 @@ public abstract class BaseMenu {
         printDynamicInfo();
     }
 
+    /**
+     * Build and return a {@link models.Request} corresponding to the numeric
+     * menu choice.
+     *
+     * @param choice the numeric option selected by the user
+     * @return a {@link models.Request} instance, or {@code null} if the choice
+     *         has no associated request builder
+     */
     public Request handleChoice(int choice) {
         Supplier<Request> builder = getRequestBuilders().get(choice);
 
@@ -122,6 +179,17 @@ public abstract class BaseMenu {
         return builder.get();
     }
 
+    /**
+     * Prompt the user to select an option from the menu and return the chosen
+     * integer value.
+     *
+     * <p>
+     * Returns {@code -1} when input was interrupted by a notification and the
+     * caller should retry the menu loop.
+     * </p>
+     *
+     * @return the chosen option index, or {@code -1} if input was interrupted
+     */
     public int getChoice() {
         setCurrAction(null);
         String prompt = "Seleziona un'opzione: ";
@@ -146,6 +214,19 @@ public abstract class BaseMenu {
         }
     }
 
+    /**
+     * Request a line of input from the user with an optional screen reset
+     * after receiving input.
+     *
+     * <p>
+     * If a notification arrives while waiting, the method returns {@code null}
+     * and sets the notification as general data to be shown.
+     * </p>
+     *
+     * @param prompt          the prompt text to display
+     * @param resetAfterInput if {@code true}, the screen is reset after input
+     * @return the trimmed input line, or {@code null} if input was interrupted
+     */
     public String requestInput(String prompt, boolean resetAfterInput) {
         System.out.print("╠ " + prompt);
         while (true) {
@@ -171,13 +252,14 @@ public abstract class BaseMenu {
 
     /**
      * Prompts the user for credentials using the provided username and password
-     * prompts,
-     * reads the input from the console, and returns a {@link User} object with the
-     * entered values.
+     * prompts, reads the input from the console, and returns an
+     * {@link models.AuthRequest} with the entered values.
      *
      * @param usernamePrompt the prompt message for the username input
      * @param passwordPrompt the prompt message for the password input
-     * @return a {@link User} object containing the entered username and password
+     * @return an {@link models.AuthRequest} containing the entered username and
+     *         password,
+     *         or {@code null} if input was interrupted
      */
     public AuthRequest requestCredentials(String usernamePrompt, String passwordPrompt) {
         resetScreen();
@@ -191,22 +273,40 @@ public abstract class BaseMenu {
     }
 
     /**
-     * Returns proposal words collected from UI.
+     * Collect proposal words from the user.
      *
      * <p>
-     * Only menus that support proposal creation should override this method.
+     * Menus that support proposal creation should override this method to
+     * provide the required input flow. The default implementation throws
+     * {@link UnsupportedOperationException}.
      * </p>
      *
-     * @return list of words for the proposal
+     * @return a list of proposal words
+     * @throws UnsupportedOperationException when the menu does not support
+     *                                       proposals
      */
     public List<String> getWordsForProposal() {
         throw new UnsupportedOperationException("Proposal input is not supported in this menu");
     }
 
+    /**
+     * Obtain a game id from the user.
+     *
+     * @return the selected game id
+     * @throws UnsupportedOperationException when the menu does not support game id
+     *                                       input
+     */
     public int getGameId() {
         throw new UnsupportedOperationException("Game ID input is not supported in this menu");
     }
 
+    /**
+     * Build a {@link models.LeaderboardReq} from user input.
+     *
+     * @return a leaderboard request
+     * @throws UnsupportedOperationException when the menu does not support
+     *                                       leaderboard requests
+     */
     public LeaderboardReq getLeaderboardRequest() {
         throw new UnsupportedOperationException("Leaderboard request is not supported in this menu");
     }
@@ -277,18 +377,49 @@ public abstract class BaseMenu {
 
     /* Template Hooks */
 
+    /**
+     * Return the human-readable menu title shown in the title area.
+     *
+     * @return the menu title string
+     */
     protected abstract String getMenuTitle();
 
+    /**
+     * Return a map of menu option indices to option labels.
+     *
+     * @return a map where keys are option numbers and values are option labels
+     */
     protected abstract Map<Integer, String> getMenuOptions();
 
+    /**
+     * Return a map of menu option indices to request builder suppliers.
+     *
+     * The returned suppliers are invoked by {@link #handleChoice(int)} to
+     * construct the {@link models.Request} instance associated with a choice.
+     *
+     * @return a map of option index to {@link Supplier} of {@link Request}
+     */
     protected abstract Map<Integer, Supplier<Request>> getRequestBuilders();
 
+    /**
+     * Hook for subclasses to render additional content between the title and
+     * the options list. The default implementation does nothing.
+     */
     protected void printCustomContent() {
-        // opzionale
+        // optional
     }
 
     /* Utility Methods */
 
+    /**
+     * Clear the console screen in a platform-specific manner.
+     *
+     * <p>
+     * Attempts to run the Windows "cls" command on Windows platforms and
+     * emits ANSI clear codes on Unix-like systems. If both approaches fail, a
+     * fallback of printing empty lines is used.
+     * </p>
+     */
     protected void clearScreen() {
         String os = System.getProperty("os.name").toLowerCase();
         try {
@@ -307,6 +438,11 @@ public abstract class BaseMenu {
         }
     }
 
+    /**
+     * Reset transient display state and re-render the menu.
+     *
+     * This clears the last message, clears the screen and calls {@link #show()}.
+     */
     protected void resetScreen() {
         lastMessage = null;
         clearScreen();

@@ -15,6 +15,14 @@ import server.GameManager;
 import server.Session;
 import server.db.DBManager;
 
+/**
+ * Handler for {@code GAME_STATS} requests.
+ *
+ * <p>If the requested game id is {@code -1} or equals the current active
+ * game's id, the handler returns a lightweight {@link OngoingGameStats}
+ * summary for the active round. Otherwise it loads the completed game from
+ * persistent storage and returns its full {@link CompletedGame} representation.</p>
+ */
 public class GameStatsRequestHandler implements RequestActionHandler {
 
     public final GameManager gameManager;

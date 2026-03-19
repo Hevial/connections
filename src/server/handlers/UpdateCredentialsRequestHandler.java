@@ -13,6 +13,17 @@ import server.Session;
 import server.db.DBManager;
 import server.db.DBStatus;
 
+/**
+ * Handler for {@code UPDATE_CREDENTIALS} requests.
+ *
+ * <p>
+ * Expects a JSON payload containing {@code oldUser} and {@code newUser}
+ * objects (each with username and password). The handler validates the input,
+ * invokes {@link server.db.DBManager#updateCredentials}, updates the session
+ * username when appropriate, and returns a {@link Response} indicating the
+ * result.
+ * </p>
+ */
 public class UpdateCredentialsRequestHandler implements RequestActionHandler {
 
     @Override
@@ -30,7 +41,7 @@ public class UpdateCredentialsRequestHandler implements RequestActionHandler {
                     "Registration failed: Missing credentials", null);
         }
 
-        // Estrarre i dati dal JsonElement
+        // Extract data from JSON
         Gson gson = new Gson();
         AuthRequest oldUser = gson.fromJson(body.get("oldUser"), AuthRequest.class);
         AuthRequest newUser = gson.fromJson(body.get("newUser"), AuthRequest.class);
